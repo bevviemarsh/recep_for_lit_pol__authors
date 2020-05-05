@@ -1,0 +1,6 @@
+body {
+  @include flexPosition(center, center, row);
+  @include widthAndHeightParams(100vw, 100vh);
+  font-family: $mainFontFamily;
+  background-color: $lightBrownColor;
+}

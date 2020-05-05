@@ -1,0 +1,23 @@
+@mixin flexPosition($horizontalValue, $verticalValue, $flexDirection) {
+  display: flex;
+  justify-content: $horizontalValue;
+  align-items: $verticalValue;
+  flex-direction: $flexDirection;
+}
+
+@mixin widthAndHeightParams($widthValue, $heightValue) {
+  width: $widthValue;
+  height: $heightValue;
+}
+
+@mixin fontParams(
+  $fontSizeValue,
+  $letterSpacingValue,
+  $fontWeightValue,
+  $colorValue
+) {
+  font-size: $fontSizeValue;
+  letter-spacing: $letterSpacingValue;
+  font-weight: $fontWeightValue;
+  color: $colorValue;
+}
