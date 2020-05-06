@@ -1,60 +1,51 @@
 .main {
   @include widthAndHeightParams(100%, 100%);
   display: grid;
-  grid-template-columns: 0 15% 25% 1fr 0;
-  grid-template-rows: 25% 1fr 5%;
-  gap: 2%;
+  grid-template-columns: 0 minmax(5%, 15%) minmax(15%, 25%) minmax(35%, 1fr) 0;
+  grid-template-rows: minmax(15%, 25%) 1fr 5%;
+  gap: $gapValue;
   grid-template-areas:
     "titles titles titles titles titles"
     ". select info chart ." "footer footer footer footer footer";
 
   &__header {
     grid-area: titles;
-    background-color: $firstDarkBrownColor;
+    background-color: $darkBrown;
     display: grid;
     grid-template-rows: 60% 40%;
     grid-template-areas: "title" "subtitle";
 
     &--title {
-      grid-area: title;
-      @include fontParams(
+      @include headersParams(
+        title,
         $largeFontSize,
         $letterSpacing,
         lighter,
-        $firstLightColor
+        $light,
+        center start,
+        $gapValue
       );
-      place-self: center start;
-      padding-left: 2%;
     }
 
     &--subtitle {
-      grid-area: subtitle;
-      background-color: $lightBrownColor;
-      @include fontParams(
+      @include headersParams(
+        subtitle,
         $bigFontSize,
         $letterSpacing,
         lighter,
-        $firstDarkBrownColor
+        $light,
+        center start,
+        $gapValue
       );
-      @include widthAndHeightParams(100%, 100%);
-      line-height: $bigFontSize;
-      padding-left: 2%;
     }
   }
 
   &__select {
-    grid-area: select;
-    background-color: $firstLightColor;
-    @include flexPosition(space-around, center, column);
-    box-shadow: -2px 2px 5px 2px $firstDarkBrownColor;
+    @include areaParams(select, $light, space-around, center, column);
+    box-shadow: $boxShadowValues;
 
     &--info {
-      @include fontParams(
-        $mediumFontSize,
-        $letterSpacing,
-        bold,
-        $firstDarkBrownColor
-      );
+      @include fontParams($mediumFontSize, $letterSpacing, bold, $darkBrown);
       margin: $distanceValue;
       text-transform: uppercase;
     }
@@ -63,34 +54,32 @@
       @include widthAndHeightParams(50%, 5%);
       margin: $distanceValue;
       @include flexPosition(start, center, row);
-      @include fontParams(
-        $smallFontSize,
-        $letterSpacing,
-        lighter,
-        $firstDarkBrownColor
-      );
+      @include fontParams($smallFontSize, $letterSpacing, lighter, $darkBrown);
 
       & input[type="checkbox"] {
         -webkit-appearance: none;
         appearance: none;
         position: relative;
         @include widthAndHeightParams(1em, 1em);
-        background-color: $firstDarkBrownColor;
-        // box-shadow: -1px 1px 3px 1px $firstDarkBrownColor;
+        border: 1px solid $darkBrown;
+        background-color: transparent;
         cursor: pointer;
       }
 
       & input[type="checkbox"]::before {
         content: "✔";
         position: absolute;
-        font-size: $smallFontSize;
         top: -0.3em;
         visibility: hidden;
-        color: $firstLightColor;
+        color: $light;
       }
 
       & input[type="checkbox"]:checked::before {
         visibility: visible;
+      }
+
+      & input[type="checkbox"]:checked {
+        background-color: $darkBrown;
       }
 
       & input[type="checkbox"]:focus {
@@ -99,32 +88,24 @@
 
       & label {
         padding-left: $distanceValue;
-        color: $firstDarkBrownColor;
+        color: $darkBrown;
         cursor: pointer;
       }
     }
   }
 
   &__info {
-    grid-area: info;
-    background-color: $lightBrownColor;
-    @include flexPosition(space-between, start, column);
-    // box-shadow: -2px 2px 5px 2px $firstDarkBrownColor;
+    @include areaParams(info, $lightBrown, space-between, start, column);
 
     &--labels,
     &--clear {
-      border: none;
-      background-color: $firstLightColor;
       @include widthAndHeightParams(90%, 10%);
-      box-shadow: -2px 2px 5px 2px $firstDarkBrownColor;
+      background-color: $light;
+      border: none;
+      box-shadow: $boxShadowValues;
       font-family: $mainFontFamily;
+      @include fontParams($mediumFontSize, $letterSpacing, bold, $darkBrown);
       text-transform: uppercase;
-      @include fontParams(
-        $smallFontSize,
-        $letterSpacing,
-        bold,
-        $firstDarkBrownColor
-      );
       cursor: pointer;
     }
 
@@ -135,31 +116,22 @@
 
     &--names {
       @include widthAndHeightParams(90%, 70%);
-      background-color: $firstLightColor;
-      box-shadow: -2px 2px 5px 2px $firstDarkBrownColor;
+      background-color: $light;
+      box-shadow: $boxShadowValues;
       overflow-y: scroll;
     }
   }
 
   &__graph {
-    grid-area: chart;
-    background-color: $firstLightColor;
-    @include flexPosition(center, center, row);
-    box-shadow: -2px 2px 5px 2px $firstDarkBrownColor;
+    @include areaParams(chart, $light, center, center, row);
+    box-shadow: $boxShadowValues;
   }
 
   &__footer {
-    grid-area: footer;
-    background-color: $firstDarkBrownColor;
-    @include flexPosition(center, center, row);
+    @include areaParams(footer, $darkBrown, center, center, row);
 
     &--info {
-      @include fontParams(
-        $smallFontSize,
-        $letterSpacing,
-        lighter,
-        $firstLightColor
-      );
+      @include fontParams($smallFontSize, $letterSpacing, lighter, $light);
       text-transform: uppercase;
     }
   }

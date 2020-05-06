@@ -36,10 +36,10 @@ body {
   height: 100%;
   display: -ms-grid;
   display: grid;
-  -ms-grid-columns: 0 15% 25% 1fr 0;
-      grid-template-columns: 0 15% 25% 1fr 0;
-  -ms-grid-rows: 25% 1fr 5%;
-      grid-template-rows: 25% 1fr 5%;
+  -ms-grid-columns: 0 minmax(5%, 15%) minmax(15%, 25%) minmax(35%, 1fr) 0;
+      grid-template-columns: 0 minmax(5%, 15%) minmax(15%, 25%) minmax(35%, 1fr) 0;
+  -ms-grid-rows: minmax(15%, 25%) 1fr 5%;
+      grid-template-rows: minmax(15%, 25%) 1fr 5%;
   gap: 2%;
       grid-template-areas: "titles titles titles titles titles" ". select info chart ." "footer footer footer footer footer";
 }
@@ -61,27 +61,24 @@ body {
   -ms-grid-row: 1;
   -ms-grid-column: 1;
   grid-area: title;
-  font-size: 3em;
+  font-size: 4vw;
   letter-spacing: 0.1em;
   font-weight: lighter;
   color: #f3f0ec;
   place-self: center start;
-  padding-left: 2%;
+  padding: 2%;
 }
 
 .main__header--subtitle {
   -ms-grid-row: 2;
   -ms-grid-column: 1;
   grid-area: subtitle;
-  background-color: #b0a18f;
-  font-size: 2em;
+  font-size: 3vw;
   letter-spacing: 0.1em;
   font-weight: lighter;
-  color: #333334;
-  width: 100%;
-  height: 100%;
-  line-height: 2em;
-  padding-left: 2%;
+  color: #f3f0ec;
+  place-self: center start;
+  padding: 2%;
 }
 
 .main__select {
@@ -106,7 +103,7 @@ body {
 }
 
 .main__select--info {
-  font-size: 1.2em;
+  font-size: 1.5vw;
   letter-spacing: 0.1em;
   font-weight: bold;
   color: #333334;
@@ -131,7 +128,7 @@ body {
   -webkit-box-direction: normal;
       -ms-flex-direction: row;
           flex-direction: row;
-  font-size: 1em;
+  font-size: 1vw;
   letter-spacing: 0.1em;
   font-weight: lighter;
   color: #333334;
@@ -144,14 +141,14 @@ body {
   position: relative;
   width: 1em;
   height: 1em;
-  background-color: #333334;
+  border: 1px solid #333334;
+  background-color: transparent;
   cursor: pointer;
 }
 
 .main__select--container input[type="checkbox"]::before {
   content: "✔";
   position: absolute;
-  font-size: 1em;
   top: -0.3em;
   visibility: hidden;
   color: #f3f0ec;
@@ -159,6 +156,10 @@ body {
 
 .main__select--container input[type="checkbox"]:checked::before {
   visibility: visible;
+}
+
+.main__select--container input[type="checkbox"]:checked {
+  background-color: #333334;
 }
 
 .main__select--container input[type="checkbox"]:focus {
@@ -192,18 +193,18 @@ body {
 }
 
 .main__info--labels, .main__info--clear {
-  border: none;
-  background-color: #f3f0ec;
   width: 90%;
   height: 10%;
+  background-color: #f3f0ec;
+  border: none;
   -webkit-box-shadow: -2px 2px 5px 2px #333334;
           box-shadow: -2px 2px 5px 2px #333334;
   font-family: "Antonio-Light";
-  text-transform: uppercase;
-  font-size: 1em;
+  font-size: 1.5vw;
   letter-spacing: 0.1em;
   font-weight: bold;
   color: #333334;
+  text-transform: uppercase;
   cursor: pointer;
 }
 
@@ -264,7 +265,7 @@ body {
 }
 
 .main__footer--info {
-  font-size: 1em;
+  font-size: 1vw;
   letter-spacing: 0.1em;
   font-weight: lighter;
   color: #f3f0ec;

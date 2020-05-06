@@ -21,3 +21,35 @@
   font-weight: $fontWeightValue;
   color: $colorValue;
 }
+
+@mixin headersParams(
+  $gridArea,
+  $fontSizeValue,
+  $letterSpacingValue,
+  $fontWeightValue,
+  $colorValue,
+  $placeSelf,
+  $paddingValue
+) {
+  grid-area: $gridArea;
+  @include fontParams(
+    $fontSizeValue,
+    $letterSpacingValue,
+    $fontWeightValue,
+    $colorValue
+  );
+  place-self: $placeSelf;
+  padding: $paddingValue;
+}
+
+@mixin areaParams(
+  $gridArea,
+  $bcgColorValue,
+  $horizontalValue,
+  $verticalValue,
+  $flexDirection
+) {
+  grid-area: $gridArea;
+  background-color: $bcgColorValue;
+  @include flexPosition($horizontalValue, $verticalValue, $flexDirection);
+}
