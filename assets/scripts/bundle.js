@@ -64611,17 +64611,52 @@ module.exports=[
   lollipopChart.runChart(modifiedData);
 })();
 
-},{"./dataTools/getModifiedData":4}],3:[function(require,module,exports){
+},{"./dataTools/getModifiedData":5}],3:[function(require,module,exports){
+class DataProperties {
+  constructor() {
+    this.foreignLiteratureProperty = "literatura_obca";
+  }
+}
+
+const dataProperties = new DataProperties();
+
+module.exports.dataProperties = dataProperties;
+
+},{}],4:[function(require,module,exports){
 module.exports.DATA = require("../../data/data.json");
 
-},{"../../data/data.json":1}],4:[function(require,module,exports){
+},{"../../data/data.json":1}],5:[function(require,module,exports){
 const { DATA } = require("./authors");
+const { dataProperties } = require("./DataProperties");
+const { graphProperties } = require("../graphTools/GraphProperties");
 
 const getModifiedData = (data) => {
-  console.log("hello from getModifiedData", data);
+  const { foreignLiteratureProperty } = dataProperties;
+  const { colors } = graphProperties;
+  const { richBlack, fireEngineRed, queenBlue, cadet } = colors;
+
+  console.log("prop?", foreignLiteratureProperty);
+  console.log("colors?", richBlack, fireEngineRed, queenBlue, cadet);
+  //   console.log("hello from getModifiedData", data);
   return data;
 };
 
 module.exports.modifiedData = getModifiedData(DATA);
 
-},{"./authors":3}]},{},[2]);
+},{"../graphTools/GraphProperties":6,"./DataProperties":3,"./authors":4}],6:[function(require,module,exports){
+class GraphProperties {
+  constructor() {
+    this.colors = {
+      richBlack: "#02111b",
+      fireEngineRed: "#c1292e",
+      queenBlue: "#4c6085",
+      cadet: "#5d737e",
+    };
+  }
+}
+
+const graphProperties = new GraphProperties();
+
+module.exports.graphProperties = graphProperties;
+
+},{}]},{},[2]);
