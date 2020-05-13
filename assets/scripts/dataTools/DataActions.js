@@ -1,21 +1,37 @@
 class DataActions {
   constructor() {
-    this.getItem = (item) => item;
-    this.getHeadOfList = (array) => array[0];
-    this.getTailOfList = (array) => array[array.length - 1];
-    this.getArrayFromObject = (objectName) => Object.entries(objectName);
+    this.getItem = (item) => (item ? item : null);
+
+    this.getHeadOfList = (array) => (array && array.length ? array[0] : null);
+
+    this.getTailOfList = (array) =>
+      array && array.length ? array[array.length - 1] : null;
+
+    this.getArrayFromObject = (objectName) =>
+      objectName && Object.keys(objectName).length
+        ? Object.entries(objectName)
+        : [];
+
     this.getCountedAuthorsStructure = (array, headFn, tailFn) =>
-      array.map((d) => ({
-        name: headFn(d),
-        authors: tailFn(d),
-      }));
+      array && array.length && headFn && tailFn
+        ? array.map((d) => ({
+            name: headFn(d),
+            authors: tailFn(d),
+          }))
+        : [];
+
     this.getLiteraturesTypes = (array, propertyName) =>
-      array.reduce((acc, curr) => [...acc, ...curr[propertyName]], []);
+      array && array.length && propertyName
+        ? array.reduce((acc, curr) => [...acc, ...curr[propertyName]], [])
+        : [];
+
     this.getNumberOfAuthors = (array) =>
-      array.reduce((lits, lit) => {
-        lit in lits ? lits[lit]++ : (lits[lit] = 1);
-        return lits;
-      }, {});
+      array && array.length
+        ? array.reduce((lits, lit) => {
+            lit in lits ? lits[lit]++ : (lits[lit] = 1);
+            return lits;
+          }, {})
+        : {};
   }
 }
 
@@ -44,6 +60,8 @@ class ChartDataStructure extends DataActions {
   }
 }
 
+const dataActions = new DataActions();
 const chartDataStructure = new ChartDataStructure();
 
+module.exports.dataActions = dataActions;
 module.exports.chartDataStructure = chartDataStructure;
