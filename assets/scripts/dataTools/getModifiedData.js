@@ -1,16 +1,34 @@
 const { DATA } = require("./authors");
 const { dataProperties } = require("./DataProperties");
+const { chartDataStructure } = require("./DataActions");
 const { graphProperties } = require("../graphTools/GraphProperties");
 
-const getModifiedData = (data) => {
-  const { foreignLiteratureProperty } = dataProperties;
-  const { colors } = graphProperties;
-  const { richBlack, fireEngineRed, queenBlue, cadet } = colors;
+const { foreignLiteratureProperty } = dataProperties;
+const {
+  getHeadOfList,
+  getTailOfList,
+  getArrayFromObject,
+  getCountedAuthorsStructure,
+  getLiteraturesTypes,
+  getNumberOfAuthors,
+  getLollipopStructure,
+} = chartDataStructure;
+const { colors, radius } = graphProperties;
+const { queenBlue, fireEngineRed } = colors;
 
-  console.log("prop?", foreignLiteratureProperty);
-  console.log("colors?", richBlack, fireEngineRed, queenBlue, cadet);
-  //   console.log("hello from getModifiedData", data);
-  return data;
-};
+const authorsData = DATA;
 
-module.exports.modifiedData = getModifiedData(DATA);
+module.exports.modifiedData = getLollipopStructure(
+  getCountedAuthorsStructure(
+    getArrayFromObject(
+      getNumberOfAuthors(
+        getLiteraturesTypes(authorsData, foreignLiteratureProperty)
+      )
+    ),
+    getHeadOfList,
+    getTailOfList
+  ),
+  queenBlue,
+  radius,
+  fireEngineRed
+);

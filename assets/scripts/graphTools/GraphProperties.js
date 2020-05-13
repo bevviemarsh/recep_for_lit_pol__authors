@@ -6,6 +6,7 @@ class GraphProperties {
       queenBlue: "#4c6085",
       cadet: "#5d737e",
     };
+    this.radius = 10;
   }
 }
 

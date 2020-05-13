@@ -64604,14 +64604,65 @@ module.exports=[
   const lollipopChart = (function () {
     const renderView = () => {};
 
-    const getUpdatedChart = (data) => {};
+    const getUpdatedChart = (data) => console.log("data from app", data);
 
     return { runChart: getUpdatedChart };
   })();
   lollipopChart.runChart(modifiedData);
 })();
 
-},{"./dataTools/getModifiedData":5}],3:[function(require,module,exports){
+},{"./dataTools/getModifiedData":6}],3:[function(require,module,exports){
+class DataActions {
+  constructor() {
+    this.getItem = (item) => item;
+    this.getHeadOfList = (array) => array[0];
+    this.getTailOfList = (array) => array[array.length - 1];
+    this.getArrayFromObject = (objectName) => Object.entries(objectName);
+    this.getCountedAuthorsStructure = (array, headFn, tailFn) =>
+      array.map((d) => ({
+        name: headFn(d),
+        authors: tailFn(d),
+      }));
+    this.getLiteraturesTypes = (array, propertyName) =>
+      array.reduce((acc, curr) => [...acc, ...curr[propertyName]], []);
+    this.getNumberOfAuthors = (array) =>
+      array.reduce((lits, lit) => {
+        lit in lits ? lits[lit]++ : (lits[lit] = 1);
+        return lits;
+      }, {});
+  }
+}
+
+class ChartDataStructure extends DataActions {
+  constructor() {
+    super();
+    this.getLollipopStructure = (
+      array,
+      lineColorName,
+      radiusValue,
+      circleColorName
+    ) =>
+      array.map((d, i) => ({
+        id: i,
+        x1: d.name,
+        x2: d.name,
+        y1: 0,
+        y2: d.authors,
+        lineColor: this.getItem(lineColorName),
+        text: d.authors,
+        cx: d.name,
+        cy: d.authors,
+        r: this.getItem(radiusValue),
+        circleColor: this.getItem(circleColorName),
+      }));
+  }
+}
+
+const chartDataStructure = new ChartDataStructure();
+
+module.exports.chartDataStructure = chartDataStructure;
+
+},{}],4:[function(require,module,exports){
 class DataProperties {
   constructor() {
     this.foreignLiteratureProperty = "literatura_obca";
@@ -64622,28 +64673,46 @@ const dataProperties = new DataProperties();
 
 module.exports.dataProperties = dataProperties;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 module.exports.DATA = require("../../data/data.json");
 
-},{"../../data/data.json":1}],5:[function(require,module,exports){
+},{"../../data/data.json":1}],6:[function(require,module,exports){
 const { DATA } = require("./authors");
 const { dataProperties } = require("./DataProperties");
+const { chartDataStructure } = require("./DataActions");
 const { graphProperties } = require("../graphTools/GraphProperties");
 
-const getModifiedData = (data) => {
-  const { foreignLiteratureProperty } = dataProperties;
-  const { colors } = graphProperties;
-  const { richBlack, fireEngineRed, queenBlue, cadet } = colors;
+const { foreignLiteratureProperty } = dataProperties;
+const {
+  getHeadOfList,
+  getTailOfList,
+  getArrayFromObject,
+  getCountedAuthorsStructure,
+  getLiteraturesTypes,
+  getNumberOfAuthors,
+  getLollipopStructure,
+} = chartDataStructure;
+const { colors, radius } = graphProperties;
+const { queenBlue, fireEngineRed } = colors;
 
-  console.log("prop?", foreignLiteratureProperty);
-  console.log("colors?", richBlack, fireEngineRed, queenBlue, cadet);
-  //   console.log("hello from getModifiedData", data);
-  return data;
-};
+const authorsData = DATA;
 
-module.exports.modifiedData = getModifiedData(DATA);
+module.exports.modifiedData = getLollipopStructure(
+  getCountedAuthorsStructure(
+    getArrayFromObject(
+      getNumberOfAuthors(
+        getLiteraturesTypes(authorsData, foreignLiteratureProperty)
+      )
+    ),
+    getHeadOfList,
+    getTailOfList
+  ),
+  queenBlue,
+  radius,
+  fireEngineRed
+);
 
-},{"../graphTools/GraphProperties":6,"./DataProperties":3,"./authors":4}],6:[function(require,module,exports){
+},{"../graphTools/GraphProperties":7,"./DataActions":3,"./DataProperties":4,"./authors":5}],7:[function(require,module,exports){
 class GraphProperties {
   constructor() {
     this.colors = {
@@ -64652,6 +64721,7 @@ class GraphProperties {
       queenBlue: "#4c6085",
       cadet: "#5d737e",
     };
+    this.radius = 10;
   }
 }
 

@@ -3,7 +3,7 @@
   const lollipopChart = (function () {
     const renderView = () => {};
 
-    const getUpdatedChart = (data) => {};
+    const getUpdatedChart = (data) => console.log("data from app", data);
 
     return { runChart: getUpdatedChart };
   })();
