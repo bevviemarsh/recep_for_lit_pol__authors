@@ -64604,15 +64604,26 @@ module.exports=[
   const { modifiedData } = require("./dataTools/getModifiedData");
   const { dataProperties } = require("./dataTools/DataProperties");
 
-  const { getSortedData, getFilteredByProperty, checkIfTrue } = dataActions;
+  const { getFilteredByProperty, checkIfTrue } = dataActions;
 
   const lollipopChart = (function () {
     const { chartDataStructure } = require("./dataTools/DataActions");
+    const { graphProperties } = require("./graphTools/GraphProperties");
 
     const getLollipopChartData = (data) => {
+      const { colors, radius } = graphProperties;
+      const { fireEngineRed, queenBlue } = colors;
+
       const dataForLollipopChart = data;
 
-      getUpdatedChart(dataForLollipopChart);
+      getUpdatedChart(
+        chartDataStructure.getLollipopStructure(
+          dataForLollipopChart,
+          queenBlue,
+          fireEngineRed,
+          radius
+        )
+      );
     };
 
     const renderView = (data) => {
@@ -64630,13 +64641,10 @@ module.exports=[
     .forEach((input) =>
       input.addEventListener("change", (e) =>
         lollipopChart.runChart(
-          getSortedData(
-            getFilteredByProperty(
-              modifiedData,
-              checkIfTrue(e.target.checked, e.target.value, 0),
-              checkIfTrue(e.target.checked, e.target.dataset.range, 0),
-              dataProperties.authors
-            ),
+          getFilteredByProperty(
+            modifiedData,
+            checkIfTrue(e.target.checked, e.target.value, 0),
+            checkIfTrue(e.target.checked, e.target.dataset.range, 0),
             dataProperties.authors
           )
         )
@@ -64644,7 +64652,7 @@ module.exports=[
     );
 })();
 
-},{"./dataTools/DataActions":3,"./dataTools/DataProperties":4,"./dataTools/getModifiedData":6}],3:[function(require,module,exports){
+},{"./dataTools/DataActions":3,"./dataTools/DataProperties":4,"./dataTools/getModifiedData":6,"./graphTools/GraphProperties":7}],3:[function(require,module,exports){
 class DataActions {
   constructor() {
     this.checkIfTrue = (condition, truthyOption, falsyOption) =>
@@ -64710,8 +64718,8 @@ class ChartDataStructure extends DataActions {
     this.getLollipopStructure = (
       array,
       lineColorName,
-      radiusValue,
-      circleColorName
+      circleColorName,
+      radiusValue
     ) =>
       array.map((d, i) => ({
         id: i,
@@ -64755,10 +64763,11 @@ const { DATA } = require("./authors");
 const { dataProperties } = require("./DataProperties");
 const { dataActions } = require("./DataActions");
 
-const { foreignLiteratureProperty } = dataProperties;
+const { foreignLiteratureProperty, authors } = dataProperties;
 const {
   getHeadOfList,
   getTailOfList,
+  getSortedData,
   getArrayFromObject,
   getCountedAuthorsStructure,
   getLiteraturesTypes,
@@ -64767,14 +64776,34 @@ const {
 
 const authorsData = DATA;
 
-module.exports.modifiedData = getCountedAuthorsStructure(
-  getArrayFromObject(
-    getNumberOfAuthors(
-      getLiteraturesTypes(authorsData, foreignLiteratureProperty)
-    )
+module.exports.modifiedData = getSortedData(
+  getCountedAuthorsStructure(
+    getArrayFromObject(
+      getNumberOfAuthors(
+        getLiteraturesTypes(authorsData, foreignLiteratureProperty)
+      )
+    ),
+    getHeadOfList,
+    getTailOfList
   ),
-  getHeadOfList,
-  getTailOfList
+  authors
 );
 
-},{"./DataActions":3,"./DataProperties":4,"./authors":5}]},{},[2]);
+},{"./DataActions":3,"./DataProperties":4,"./authors":5}],7:[function(require,module,exports){
+class GraphProperties {
+  constructor() {
+    this.colors = {
+      richBlack: "#02111b",
+      fireEngineRed: "#c1292e",
+      queenBlue: "#4c6085",
+      cadet: "#5d737e",
+    };
+    this.radius = 10;
+  }
+}
+
+const graphProperties = new GraphProperties();
+
+module.exports.graphProperties = graphProperties;
+
+},{}]},{},[2]);

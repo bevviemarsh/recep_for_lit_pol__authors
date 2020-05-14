@@ -2,10 +2,11 @@ const { DATA } = require("./authors");
 const { dataProperties } = require("./DataProperties");
 const { dataActions } = require("./DataActions");
 
-const { foreignLiteratureProperty } = dataProperties;
+const { foreignLiteratureProperty, authors } = dataProperties;
 const {
   getHeadOfList,
   getTailOfList,
+  getSortedData,
   getArrayFromObject,
   getCountedAuthorsStructure,
   getLiteraturesTypes,
@@ -14,12 +15,15 @@ const {
 
 const authorsData = DATA;
 
-module.exports.modifiedData = getCountedAuthorsStructure(
-  getArrayFromObject(
-    getNumberOfAuthors(
-      getLiteraturesTypes(authorsData, foreignLiteratureProperty)
-    )
+module.exports.modifiedData = getSortedData(
+  getCountedAuthorsStructure(
+    getArrayFromObject(
+      getNumberOfAuthors(
+        getLiteraturesTypes(authorsData, foreignLiteratureProperty)
+      )
+    ),
+    getHeadOfList,
+    getTailOfList
   ),
-  getHeadOfList,
-  getTailOfList
+  authors
 );
