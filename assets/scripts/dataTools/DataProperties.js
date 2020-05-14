@@ -1,6 +1,7 @@
 class DataProperties {
   constructor() {
     this.foreignLiteratureProperty = "literatura_obca";
+    this.authors = "authors";
   }
 }
 

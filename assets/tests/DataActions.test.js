@@ -1,14 +1,118 @@
 const { dataActions } = require("../scripts/dataTools/DataActions");
 
 const {
+  checkIfTrue,
   getItem,
   getHeadOfList,
   getTailOfList,
+  getFilteredByProperty,
+  getSortedData,
   getArrayFromObject,
   getCountedAuthorsStructure,
   getLiteraturesTypes,
   getNumberOfAuthors,
 } = dataActions;
+
+test("check given condition", () => {
+  const bigValue = 20;
+  const smallValue = 10;
+  const testedTruthyCondition = bigValue > smallValue;
+  const testedFalsyCondition = smallValue > bigValue;
+  const testedTruthyValue = "passed";
+  const testedFalsyValue = "failed";
+
+  expect(
+    checkIfTrue(testedTruthyCondition, testedTruthyValue, testedFalsyValue)
+  ).toBe(testedTruthyValue);
+
+  expect(
+    checkIfTrue(testedFalsyCondition, testedTruthyValue, testedFalsyValue)
+  ).toBe(testedFalsyValue);
+});
+
+test("filter given array by property", () => {
+  const testedArray = [
+    { type: "french literature", authors: 350 },
+    { type: "belgian literature", authors: 150 },
+  ];
+  const filterValue = 300;
+  const rangeValue = 1000;
+  const propertyName = "authors";
+  const expectedArray = [{ type: "french literature", authors: 350 }];
+
+  expect(
+    getFilteredByProperty(testedArray, filterValue, rangeValue, propertyName)
+  ).toStrictEqual(expectedArray);
+});
+
+test("filter with invalid inputs", () => {
+  const testedEmptyArray = [];
+  const testedEmptyValue = null;
+  const testedArray = [
+    { type: "french literature", authors: 350 },
+    { type: "belgian literature", authors: 150 },
+  ];
+  const filterValue = 300;
+  const rangeValue = 1000;
+  const propertyName = "authors";
+  const expectedArray = [];
+
+  expect(
+    getFilteredByProperty(
+      testedEmptyArray,
+      filterValue,
+      rangeValue,
+      propertyName
+    )
+  ).toStrictEqual(expectedArray);
+
+  expect(
+    getFilteredByProperty(
+      testedArray,
+      filterValue,
+      testedEmptyValue,
+      propertyName
+    )
+  ).toStrictEqual(expectedArray);
+});
+
+test("sort given array by property", () => {
+  const testedArray = [
+    { type: "swedish literature", authors: 50 },
+    { type: "french literature", authors: 350 },
+    { type: "portugal literature", authors: 15 },
+    { type: "belgian literature", authors: 150 },
+  ];
+  const propertyName = "authors";
+  const expectedArray = [
+    { type: "french literature", authors: 350 },
+    { type: "belgian literature", authors: 150 },
+    { type: "swedish literature", authors: 50 },
+    { type: "portugal literature", authors: 15 },
+  ];
+
+  expect(getSortedData(testedArray, propertyName)).toStrictEqual(expectedArray);
+});
+
+test("sort with invaild input", () => {
+  const testedEmptyArray = [];
+  const emptyProperty = "";
+  const testedArray = [
+    { type: "swedish literature", authors: 50 },
+    { type: "french literature", authors: 350 },
+    { type: "portugal literature", authors: 15 },
+    { type: "belgian literature", authors: 150 },
+  ];
+  const propertyName = "authors";
+  const expectedArray = [];
+
+  expect(getSortedData(testedEmptyArray, propertyName)).toStrictEqual(
+    expectedArray
+  );
+  expect(getSortedData(testedArray, emptyProperty)).toStrictEqual(
+    expectedArray
+  );
+});
 
 test("return unaffected item", () => {
   const testedString = "#fff";

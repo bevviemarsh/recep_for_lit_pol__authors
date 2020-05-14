@@ -1,11 +1,33 @@
 class DataActions {
   constructor() {
+    this.checkIfTrue = (condition, truthyOption, falsyOption) =>
+      condition ? truthyOption : falsyOption;
+
     this.getItem = (item) => (item ? item : null);
 
     this.getHeadOfList = (array) => (array && array.length ? array[0] : null);
 
     this.getTailOfList = (array) =>
       array && array.length ? array[array.length - 1] : null;
+
+    this.getFilteredByProperty = (
+      array,
+      filterValue,
+      rangeValue,
+      propertyName
+    ) =>
+      array && array.length && filterValue && rangeValue && propertyName
+        ? array.filter(
+            (item) =>
+              item[propertyName] >= filterValue &&
+              item[propertyName] < rangeValue
+          )
+        : [];
+
+    this.getSortedData = (array, propertyName) =>
+      array && array.length && propertyName
+        ? array.sort((a, b) => b[propertyName] - a[propertyName])
+        : [];
 
     this.getArrayFromObject = (objectName) =>
       objectName && Object.keys(objectName).length

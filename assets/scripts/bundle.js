@@ -64600,36 +64600,107 @@ module.exports=[
    
 },{}],2:[function(require,module,exports){
 (function IIFE() {
+  const { dataActions } = require("./dataTools/DataActions");
   const { modifiedData } = require("./dataTools/getModifiedData");
+  const { dataProperties } = require("./dataTools/DataProperties");
+
+  const { getSortedData, getFilteredByProperty, checkIfTrue } = dataActions;
+
   const lollipopChart = (function () {
-    const renderView = () => {};
+    const { chartDataStructure } = require("./dataTools/DataActions");
 
-    const getUpdatedChart = (data) => console.log("data from app", data);
+    const getLollipopChartData = (data) => {
+      const dataForLollipopChart = data;
 
-    return { runChart: getUpdatedChart };
+      getUpdatedChart(dataForLollipopChart);
+    };
+
+    const renderView = (data) => {
+      console.log("data from render app", data);
+    };
+
+    const getUpdatedChart = (data) => {
+      renderView(data);
+    };
+
+    return { runChart: getLollipopChartData };
   })();
-  lollipopChart.runChart(modifiedData);
+  document
+    .querySelectorAll("input")
+    .forEach((input) =>
+      input.addEventListener("change", (e) =>
+        lollipopChart.runChart(
+          getSortedData(
+            getFilteredByProperty(
+              modifiedData,
+              checkIfTrue(e.target.checked, e.target.value, 0),
+              checkIfTrue(e.target.checked, e.target.dataset.range, 0),
+              dataProperties.authors
+            ),
+            dataProperties.authors
+          )
+        )
+      )
+    );
 })();
 
-},{"./dataTools/getModifiedData":6}],3:[function(require,module,exports){
+},{"./dataTools/DataActions":3,"./dataTools/DataProperties":4,"./dataTools/getModifiedData":6}],3:[function(require,module,exports){
 class DataActions {
   constructor() {
-    this.getItem = (item) => item;
-    this.getHeadOfList = (array) => array[0];
-    this.getTailOfList = (array) => array[array.length - 1];
-    this.getArrayFromObject = (objectName) => Object.entries(objectName);
+    this.checkIfTrue = (condition, truthyOption, falsyOption) =>
+      condition ? truthyOption : falsyOption;
+
+    this.getItem = (item) => (item ? item : null);
+
+    this.getHeadOfList = (array) => (array && array.length ? array[0] : null);
+
+    this.getTailOfList = (array) =>
+      array && array.length ? array[array.length - 1] : null;
+
+    this.getFilteredByProperty = (
+      array,
+      filterValue,
+      rangeValue,
+      propertyName
+    ) =>
+      array && array.length && filterValue && rangeValue && propertyName
+        ? array.filter(
+            (item) =>
+              item[propertyName] >= filterValue &&
+              item[propertyName] < rangeValue
+          )
+        : [];
+
+    this.getSortedData = (array, propertyName) =>
+      array && array.length && propertyName
+        ? array.sort((a, b) => b[propertyName] - a[propertyName])
+        : [];
+
+    this.getArrayFromObject = (objectName) =>
+      objectName && Object.keys(objectName).length
+        ? Object.entries(objectName)
+        : [];
+
     this.getCountedAuthorsStructure = (array, headFn, tailFn) =>
-      array.map((d) => ({
-        name: headFn(d),
-        authors: tailFn(d),
-      }));
+      array && array.length && headFn && tailFn
+        ? array.map((d) => ({
+            name: headFn(d),
+            authors: tailFn(d),
+          }))
+        : [];
+
     this.getLiteraturesTypes = (array, propertyName) =>
-      array.reduce((acc, curr) => [...acc, ...curr[propertyName]], []);
+      array && array.length && propertyName
+        ? array.reduce((acc, curr) => [...acc, ...curr[propertyName]], [])
+        : [];
+
     this.getNumberOfAuthors = (array) =>
-      array.reduce((lits, lit) => {
-        lit in lits ? lits[lit]++ : (lits[lit] = 1);
-        return lits;
-      }, {});
+      array && array.length
+        ? array.reduce((lits, lit) => {
+            lit in lits ? lits[lit]++ : (lits[lit] = 1);
+            return lits;
+          }, {})
+        : {};
   }
 }
 
@@ -64658,14 +64729,17 @@ class ChartDataStructure extends DataActions {
   }
 }
 
+const dataActions = new DataActions();
 const chartDataStructure = new ChartDataStructure();
 
+module.exports.dataActions = dataActions;
 module.exports.chartDataStructure = chartDataStructure;
 
 },{}],4:[function(require,module,exports){
 class DataProperties {
   constructor() {
     this.foreignLiteratureProperty = "literatura_obca";
+    this.authors = "authors";
   }
 }
 
@@ -64679,8 +64753,7 @@ module.exports.DATA = require("../../data/data.json");
 },{"../../data/data.json":1}],6:[function(require,module,exports){
 const { DATA } = require("./authors");
 const { dataProperties } = require("./DataProperties");
-const { chartDataStructure } = require("./DataActions");
-const { graphProperties } = require("../graphTools/GraphProperties");
+const { dataActions } = require("./DataActions");
 
 const { foreignLiteratureProperty } = dataProperties;
 const {
@@ -64690,43 +64763,18 @@ const {
   getCountedAuthorsStructure,
   getLiteraturesTypes,
   getNumberOfAuthors,
-  getLollipopStructure,
-} = chartDataStructure;
-const { colors, radius } = graphProperties;
-const { queenBlue, fireEngineRed } = colors;
+} = dataActions;
 
 const authorsData = DATA;
 
-module.exports.modifiedData = getLollipopStructure(
-  getCountedAuthorsStructure(
-    getArrayFromObject(
-      getNumberOfAuthors(
-        getLiteraturesTypes(authorsData, foreignLiteratureProperty)
-      )
-    ),
-    getHeadOfList,
-    getTailOfList
+module.exports.modifiedData = getCountedAuthorsStructure(
+  getArrayFromObject(
+    getNumberOfAuthors(
+      getLiteraturesTypes(authorsData, foreignLiteratureProperty)
+    )
   ),
-  queenBlue,
-  radius,
-  fireEngineRed
+  getHeadOfList,
+  getTailOfList
 );
 
-},{"../graphTools/GraphProperties":7,"./DataActions":3,"./DataProperties":4,"./authors":5}],7:[function(require,module,exports){
-class GraphProperties {
-  constructor() {
-    this.colors = {
-      richBlack: "#02111b",
-      fireEngineRed: "#c1292e",
-      queenBlue: "#4c6085",
-      cadet: "#5d737e",
-    };
-    this.radius = 10;
-  }
-}
-
-const graphProperties = new GraphProperties();
-
-module.exports.graphProperties = graphProperties;
-
-},{}]},{},[2]);
+},{"./DataActions":3,"./DataProperties":4,"./authors":5}]},{},[2]);
