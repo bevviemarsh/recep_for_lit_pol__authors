@@ -4,9 +4,8 @@ const { GraphParams } = require("./GraphParams");
 
 const { graphId } = graphProperties;
 
-const graphParams = new GraphParams(graphId);
+module.exports.mainContainer = graphParams = new GraphParams(graphId);
 const {
-  mainContainer,
   basicWidth,
   basicHeight,
   svgWidth,

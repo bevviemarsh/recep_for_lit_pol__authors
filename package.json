@@ -22,6 +22,7 @@
     "watchify": "^3.11.1"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
     "jest": "^26.0.0"
   }
 }

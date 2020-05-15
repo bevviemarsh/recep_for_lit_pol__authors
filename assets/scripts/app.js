@@ -26,7 +26,7 @@
     };
 
     const renderView = (data) => {
-      console.log("data from render app", data);
+      console.log("data from render", data);
     };
 
     const getUpdatedChart = (data) => {
