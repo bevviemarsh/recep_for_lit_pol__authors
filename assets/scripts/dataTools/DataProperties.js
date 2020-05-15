@@ -1,8 +1,6 @@
 class DataProperties {
-  constructor() {
-    this.foreignLiteratureProperty = "literatura_obca";
-    this.authors = "authors";
-  }
+  foreignLiteratureProperty = "literatura_obca";
+  authors = "authors";
 }
 
 const dataProperties = new DataProperties();

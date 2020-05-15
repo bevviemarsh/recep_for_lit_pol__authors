@@ -64654,87 +64654,75 @@ module.exports=[
 
 },{"./dataTools/DataActions":3,"./dataTools/DataProperties":4,"./dataTools/getModifiedData":6,"./graphTools/GraphProperties":7}],3:[function(require,module,exports){
 class DataActions {
-  constructor() {
-    this.checkIfTrue = (condition, truthyOption, falsyOption) =>
-      condition ? truthyOption : falsyOption;
+  checkIfTrue = (condition, truthyOption, falsyOption) =>
+    condition ? truthyOption : falsyOption;
 
-    this.getItem = (item) => (item ? item : null);
+  getItem = (item) => (item ? item : null);
 
-    this.getHeadOfList = (array) => (array && array.length ? array[0] : null);
+  getHeadOfList = (array) => (array && array.length ? array[0] : null);
 
-    this.getTailOfList = (array) =>
-      array && array.length ? array[array.length - 1] : null;
+  getTailOfList = (array) =>
+    array && array.length ? array[array.length - 1] : null;
 
-    this.getFilteredByProperty = (
-      array,
-      filterValue,
-      rangeValue,
-      propertyName
-    ) =>
-      array && array.length && filterValue && rangeValue && propertyName
-        ? array.filter(
-            (item) =>
-              item[propertyName] >= filterValue &&
-              item[propertyName] < rangeValue
-          )
-        : [];
+  getFilteredByProperty = (array, filterValue, rangeValue, propertyName) =>
+    array && array.length && filterValue && rangeValue && propertyName
+      ? array.filter(
+          (item) =>
+            item[propertyName] >= filterValue && item[propertyName] < rangeValue
+        )
+      : [];
 
-    this.getSortedData = (array, propertyName) =>
-      array && array.length && propertyName
-        ? array.sort((a, b) => b[propertyName] - a[propertyName])
-        : [];
+  getSortedData = (array, propertyName) =>
+    array && array.length && propertyName
+      ? array.sort((a, b) => b[propertyName] - a[propertyName])
+      : [];
 
-    this.getArrayFromObject = (objectName) =>
-      objectName && Object.keys(objectName).length
-        ? Object.entries(objectName)
-        : [];
+  getArrayFromObject = (objectName) =>
+    objectName && Object.keys(objectName).length
+      ? Object.entries(objectName)
+      : [];
 
-    this.getCountedAuthorsStructure = (array, headFn, tailFn) =>
-      array && array.length && headFn && tailFn
-        ? array.map((d) => ({
-            name: headFn(d),
-            authors: tailFn(d),
-          }))
-        : [];
+  getCountedAuthorsStructure = (array, headFn, tailFn) =>
+    array && array.length && headFn && tailFn
+      ? array.map((d) => ({
+          name: headFn(d),
+          authors: tailFn(d),
+        }))
+      : [];
 
-    this.getLiteraturesTypes = (array, propertyName) =>
-      array && array.length && propertyName
-        ? array.reduce((acc, curr) => [...acc, ...curr[propertyName]], [])
-        : [];
+  getLiteraturesTypes = (array, propertyName) =>
+    array && array.length && propertyName
+      ? array.reduce((acc, curr) => [...acc, ...curr[propertyName]], [])
+      : [];
 
-    this.getNumberOfAuthors = (array) =>
-      array && array.length
-        ? array.reduce((lits, lit) => {
-            lit in lits ? lits[lit]++ : (lits[lit] = 1);
-            return lits;
-          }, {})
-        : {};
-  }
+  getNumberOfAuthors = (array) =>
+    array && array.length
+      ? array.reduce((lits, lit) => {
+          lit in lits ? lits[lit]++ : (lits[lit] = 1);
+          return lits;
+        }, {})
+      : {};
 }
 
 class ChartDataStructure extends DataActions {
   constructor() {
     super();
-    this.getLollipopStructure = (
-      array,
-      lineColorName,
-      circleColorName,
-      radiusValue
-    ) =>
-      array.map((d, i) => ({
-        id: i,
-        x1: d.name,
-        x2: d.name,
-        y1: 0,
-        y2: d.authors,
-        lineColor: this.getItem(lineColorName),
-        text: d.authors,
-        cx: d.name,
-        cy: d.authors,
-        r: this.getItem(radiusValue),
-        circleColor: this.getItem(circleColorName),
-      }));
   }
+
+  getLollipopStructure = (array, lineColorName, circleColorName, radiusValue) =>
+    array.map((d, i) => ({
+      id: i,
+      x1: d.name,
+      x2: d.name,
+      y1: 0,
+      y2: d.authors,
+      lineColor: this.getItem(lineColorName),
+      text: d.authors,
+      cx: d.name,
+      cy: d.authors,
+      r: this.getItem(radiusValue),
+      circleColor: this.getItem(circleColorName),
+    }));
 }
 
 const dataActions = new DataActions();
@@ -64745,10 +64733,8 @@ module.exports.chartDataStructure = chartDataStructure;
 
 },{}],4:[function(require,module,exports){
 class DataProperties {
-  constructor() {
-    this.foreignLiteratureProperty = "literatura_obca";
-    this.authors = "authors";
-  }
+  foreignLiteratureProperty = "literatura_obca";
+  authors = "authors";
 }
 
 const dataProperties = new DataProperties();
@@ -64791,15 +64777,19 @@ module.exports.modifiedData = getSortedData(
 
 },{"./DataActions":3,"./DataProperties":4,"./authors":5}],7:[function(require,module,exports){
 class GraphProperties {
-  constructor() {
-    this.colors = {
-      richBlack: "#02111b",
-      fireEngineRed: "#c1292e",
-      queenBlue: "#4c6085",
-      cadet: "#5d737e",
-    };
-    this.radius = 10;
-  }
+  graphId = "graph";
+
+  colors = {
+    richBlack: "#02111b",
+    fireEngineRed: "#c1292e",
+    queenBlue: "#4c6085",
+    cadet: "#5d737e",
+  };
+
+  margin = 10;
+  graphMargins = { top: 90, left: 20, right: 90, bottom: 150 };
+
+  radius = 10;
 }
 
 const graphProperties = new GraphProperties();
