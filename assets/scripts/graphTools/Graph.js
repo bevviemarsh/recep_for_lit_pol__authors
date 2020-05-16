@@ -1,10 +1,10 @@
 const d3 = require("d3");
 const { graphProperties } = require("./GraphProperties");
-const { GraphParams } = require("./GraphParams");
+const { graphParams } = require("./GraphParams");
 
 const { graphId } = graphProperties;
 
-module.exports.mainContainer = graphParams = new GraphParams(graphId);
+// module.exports.mainContainer = new GraphParams(graphId);
 const {
   basicWidth,
   basicHeight,

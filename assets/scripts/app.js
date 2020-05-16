@@ -8,6 +8,9 @@
   const lollipopChart = (function () {
     const { chartDataStructure } = require("./dataTools/DataActions");
     const { graphProperties } = require("./graphTools/GraphProperties");
+    const { mainContainer } = require("./graphTools/Graph");
+    const { graphParams } = require("./graphTools/GraphParams");
+    console.log(graphParams);
 
     const getLollipopChartData = (data) => {
       const { colors, radius } = graphProperties;

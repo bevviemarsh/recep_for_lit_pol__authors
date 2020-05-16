@@ -1,6 +1,12 @@
 class GraphProperties {
   graphId = "graph";
 
+  graphParamsProperties = {
+    width: "width",
+    height: "height",
+    position: "position",
+  };
+
   colors = {
     richBlack: "#02111b",
     fireEngineRed: "#c1292e",
