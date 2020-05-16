@@ -11,20 +11,15 @@ const {
 const { width, height, position } = graphParamsProperties;
 
 class GraphPropertyFactory {
-  constructor() {
-    this.createProperties = (type) => {
-      let graphProperty;
-      if (type === "width") {
-        graphProperty = new GraphWidthProperty();
-      } else if (type === "height") {
-        graphProperty = new GraphHeightProperty();
-      } else if (type === "position") {
-        graphProperty = new GraphPositionProperty();
-      }
-
-      return graphProperty;
-    };
-  }
+  createProperties = (type) => {
+    if (type === "width") {
+      return new GraphWidthProperty();
+    } else if (type === "height") {
+      return new GraphHeightProperty();
+    } else if (type === "position") {
+      return new GraphPositionProperty();
+    }
+  };
 }
 
 class GraphContainer {
@@ -33,14 +28,16 @@ class GraphContainer {
   }
 }
 
+const graphContainer = new GraphContainer(graphId);
+
 class GraphWidthProperty {
-  basicWidth = new GraphContainer(graphId).mainContainer.offsetWidth;
+  basicWidth = graphContainer.mainContainer.offsetWidth;
   svgWidth = this.basicWidth - margin;
   graphWidth = this.svgWidth - graphMargins.left - graphMargins.right;
 }
 
 class GraphHeightProperty {
-  basicHeight = new GraphContainer(graphId).mainContainer.offsetHeight;
+  basicHeight = graphContainer.mainContainer.offsetHeight;
   svgHeight = this.basicHeight - margin;
   graphHeight = this.svgHeight - graphMargins.top - graphMargins.bottom;
 }
@@ -55,6 +52,7 @@ const graphHeightProperties = factory.createProperties(height);
 const graphPositionProperties = factory.createProperties(position);
 
 module.exports.graphParams = {
+  graphContainer,
   graphWidthProperties,
   graphHeightProperties,
   graphPositionProperties,

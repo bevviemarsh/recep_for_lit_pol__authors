@@ -1,8 +1,11 @@
-const { Graph, mainContainer } = require("./Graph");
+const { Graph } = require("./Graph");
+const { graphParams } = require("./GraphParams");
 
-module.exports.graph = new Graph(mainContainer);
+const { graphContainer } = graphParams;
 
-module.exports.GraphGroups = class GraphGroups {
+const chart = new Graph(graphContainer.mainContainer);
+
+class GraphGroups {
   constructor(mainChart) {
     this.linesGroup = mainChart.append("g");
     this.circlesGroup = mainChart.append("g");
@@ -10,4 +13,8 @@ module.exports.GraphGroups = class GraphGroups {
     this.xAxisGroup = mainChart.append("g");
     this.yAxisGroup = mainChart.append("g");
   }
-};
+}
+
+const groups = new GraphGroups(chart.mainChart);
+
+module.exports.groups = groups;
