@@ -36,7 +36,10 @@ class yAxis {
 }
 
 class xScale {
-  xScale = d3.scaleBand().range([0, graphWidthProperties.graphWidth]);
+  xScale = d3
+    .scaleBand()
+    .range([0, graphWidthProperties.graphWidth])
+    .padding(1);
 }
 
 class yScale {

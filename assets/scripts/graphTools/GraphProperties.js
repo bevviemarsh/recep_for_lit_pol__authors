@@ -22,9 +22,10 @@ class GraphProperties {
   };
 
   margin = 10;
-  graphMargins = { top: 90, left: 20, right: 90, bottom: 150 };
+  graphMargins = { top: 80, left: 20, right: 90, bottom: 100 };
 
-  durationTime = 2000;
+  axesDurationTime = 200;
+  dataDurationTime = 300;
 
   radius = 10;
 }

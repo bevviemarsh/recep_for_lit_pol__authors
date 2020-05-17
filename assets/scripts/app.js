@@ -9,7 +9,7 @@
     const d3 = require("d3");
     const { chartDataStructure } = require("./dataTools/DataActions");
     const { graphProperties } = require("./graphTools/GraphProperties");
-    const { graphParams } = require("./graphTools/GraphParams");
+    const { graphActions } = require("./graphTools/GraphActions");
     const { groups } = require("./graphTools/GraphGroups");
     const { axes } = require("./graphTools/AxesFactory");
 
@@ -33,46 +33,81 @@
       console.log("data from render", data);
       const { linesGroup, circlesGroup, labelsGroup } = groups;
       const { x, y, scaleX, scaleY } = axes;
-      const { durationTime } = graphProperties;
+      const { axesDurationTime, dataDurationTime } = graphProperties;
+      const { rotate } = graphActions;
 
       scaleX.xScale.domain(data.map((d) => d.x1));
       scaleY.yScale.domain([
         0,
-        Math.ceil(Math.max(data.map((d) => d.y2)) / 100) * 100,
+        Math.ceil(Math.max(...data.map((d) => d.y2)) / 100) * 100,
       ]);
 
       x.xAxis
         .transition()
-        .duration(durationTime)
+        .duration(axesDurationTime)
         .call(d3.axisBottom(scaleX.xScale));
-      // x
-      //   .selectAll("text")
-      //   .attr("transform", rotate(axesTestRotate))
-      //   .attr("text-anchor", axesTextAnchor)
-      //   .style("font-size", axesFontSize)
-      //   .style("font-weight", axesFontWeight);
+      x.xAxis
+        .selectAll("text")
+        .attr("transform", rotate(-45))
+        .attr("text-anchor", "end")
+        .style("font-size", "12px")
+        .style("font-weight", "bold");
 
       y.yAxis
         .transition()
-        .duration(durationTime)
+        .duration(axesDurationTime)
         .call(d3.axisLeft(scaleY.yScale).ticks(5));
-      // yAxis.selectAll("text").style("font-size", axesFontSize);
+      y.yAxis.selectAll("text").style("font-size", "10px");
 
       const lines = linesGroup.selectAll("line").data(data, (d) => d.id);
+      const circles = circlesGroup.selectAll("circle").data(data, (d) => d.id);
+      const labels = labelsGroup.selectAll("text").data(data, (d) => d.id);
 
       lines
         .enter()
         .append("line")
         .attr("x1", (d) => scaleX.xScale(d.x1))
         .attr("x2", (d) => scaleX.xScale(d.x2))
-        .attr("y1", (d) => scaleY.yScale(d.y1))
-        .attr("y2", (d) => scaleY.yScale(d.y2))
-        .attr("stroke", (d) => d.lineColor);
-      // .transition()
-      // .duration(durationTime)
-      // .attr("x1", (d) => scaleX.xScale(d.x1));
+        .attr("y1", scaleY.yScale(0))
+        .attr("y2", scaleY.yScale(0))
+        .attr("stroke", (d) => d.lineColor)
+        .attr("stroke-width", 5)
+        .merge(lines)
+        .transition()
+        .duration(dataDurationTime)
+        .attr("y2", (d) => scaleY.yScale(d.y2));
+
+      circles
+        .enter()
+        .append("circle")
+        .attr("cx", (d) => scaleX.xScale(d.cx))
+        .attr("cy", scaleY.yScale(0))
+        .attr("r", (d) => d.r)
+        .attr("fill", (d) => d.circleColor)
+        .attr("cursor", "pointer")
+        .merge(circles)
+        .transition()
+        .duration(dataDurationTime)
+        .attr("cy", (d) => scaleY.yScale(d.cy));
+
+      labels
+        .enter()
+        .append("text")
+        // .attr("class", lollipopClass.substr(1))
+        .text((d) => d.text)
+        .attr("x", (d) => scaleX.xScale(d.cx))
+        .attr("y", scaleY.yScale(0))
+        .attr("text-anchor", "middle")
+        .attr("font-size", "15px")
+        .attr("letter-spacing", 1)
+        .merge(labels)
+        .transition()
+        .duration(dataDurationTime)
+        .attr("y", (d) => scaleY.yScale(d.cy) - 15);
 
       lines.exit().remove();
+      circles.exit().remove();
+      labels.exit().remove();
     };
 
     const getUpdatedChart = (data) => {
