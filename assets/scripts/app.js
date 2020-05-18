@@ -11,7 +11,7 @@
     const { graphProperties } = require("./graphTools/GraphProperties");
     const { graphActions } = require("./graphTools/GraphActions");
     const { groups } = require("./graphTools/GraphGroups");
-    const { axes } = require("./graphTools/AxesFactory");
+    const { scalesAndAxesElements } = require("./graphTools/AxesFactory");
 
     const getLollipopChartData = (data) => {
       const { colors, radius } = graphProperties;
@@ -32,32 +32,61 @@
     const renderView = (data) => {
       console.log("data from render", data);
       const { linesGroup, circlesGroup, labelsGroup } = groups;
-      const { x, y, scaleX, scaleY } = axes;
-      const { axesDurationTime, dataDurationTime } = graphProperties;
-      const { rotate } = graphActions;
+      const { scales, axes } = scalesAndAxesElements;
+      const {
+        radius,
+        axesDurationTime,
+        dataDurationTime,
+        colors,
+        axesProperties,
+        labelsProperties,
+        strokeWidth,
+        cursorType,
+      } = graphProperties;
+      const { richBlack } = colors;
+      const {
+        axestextRotateValue,
+        axesTextAnchorPosition,
+        axesFontSize,
+        axesFontWeight,
+      } = axesProperties;
+      const {
+        labelClass,
+        labelTextAnchorPosition,
+        labelFontSizeValue,
+        labelLetterSpacingValue,
+        opacityStatus,
+      } = labelsProperties;
+      const {
+        mapArray,
+        getMaxiumElement,
+        getYAxisDimension,
+        rotate,
+        getLabelsYPosition,
+      } = graphActions;
 
-      scaleX.xScale.domain(data.map((d) => d.x1));
-      scaleY.yScale.domain([
+      scales.xScale.domain(mapArray(data, "x1"));
+      scales.yScale.domain([
         0,
-        Math.ceil(Math.max(...data.map((d) => d.y2)) / 100) * 100,
+        getYAxisDimension(getMaxiumElement(mapArray(data, "y2"))),
       ]);
 
-      x.xAxis
+      axes.xAxis
         .transition()
         .duration(axesDurationTime)
-        .call(d3.axisBottom(scaleX.xScale));
-      x.xAxis
+        .call(d3.axisBottom(scales.xScale));
+      axes.xAxis
         .selectAll("text")
-        .attr("transform", rotate(-45))
-        .attr("text-anchor", "end")
-        .style("font-size", "12px")
-        .style("font-weight", "bold");
+        .attr("transform", rotate(axestextRotateValue))
+        .attr("text-anchor", axesTextAnchorPosition)
+        .style("font-size", axesFontSize)
+        .style("font-weight", axesFontWeight);
 
-      y.yAxis
+      axes.yAxis
         .transition()
         .duration(axesDurationTime)
-        .call(d3.axisLeft(scaleY.yScale).ticks(5));
-      y.yAxis.selectAll("text").style("font-size", "10px");
+        .call(d3.axisLeft(scales.yScale).ticks(5));
+      axes.yAxis.selectAll("text").style("font-size", "10px");
 
       const lines = linesGroup.selectAll("line").data(data, (d) => d.id);
       const circles = circlesGroup.selectAll("circle").data(data, (d) => d.id);
@@ -66,44 +95,46 @@
       lines
         .enter()
         .append("line")
-        .attr("x1", (d) => scaleX.xScale(d.x1))
-        .attr("x2", (d) => scaleX.xScale(d.x2))
-        .attr("y1", scaleY.yScale(0))
-        .attr("y2", scaleY.yScale(0))
+        .attr("x1", (d) => scales.xScale(d.x1))
+        .attr("x2", (d) => scales.xScale(d.x2))
+        .attr("y1", scales.yScale(0))
+        .attr("y2", scales.yScale(0))
         .attr("stroke", (d) => d.lineColor)
-        .attr("stroke-width", 5)
+        .attr("stroke-width", strokeWidth)
         .merge(lines)
         .transition()
         .duration(dataDurationTime)
-        .attr("y2", (d) => scaleY.yScale(d.y2));
+        .attr("y2", (d) => scales.yScale(d.y2));
 
       circles
         .enter()
         .append("circle")
-        .attr("cx", (d) => scaleX.xScale(d.cx))
-        .attr("cy", scaleY.yScale(0))
+        .attr("cx", (d) => scales.xScale(d.cx))
+        .attr("cy", scales.yScale(0))
         .attr("r", (d) => d.r)
         .attr("fill", (d) => d.circleColor)
-        .attr("cursor", "pointer")
+        .attr("cursor", cursorType)
         .merge(circles)
         .transition()
         .duration(dataDurationTime)
-        .attr("cy", (d) => scaleY.yScale(d.cy));
+        .attr("cy", (d) => scales.yScale(d.cy));
 
       labels
         .enter()
         .append("text")
-        // .attr("class", lollipopClass.substr(1))
+        .attr("class", labelClass.substr(1))
         .text((d) => d.text)
-        .attr("x", (d) => scaleX.xScale(d.cx))
-        .attr("y", scaleY.yScale(0))
-        .attr("text-anchor", "middle")
-        .attr("font-size", "15px")
-        .attr("letter-spacing", 1)
+        .attr("x", (d) => scales.xScale(d.cx))
+        .attr("y", scales.yScale(0))
+        .attr("text-anchor", labelTextAnchorPosition)
+        .attr("font-size", labelFontSizeValue)
+        .attr("letter-spacing", labelLetterSpacingValue)
+        .attr("fill", richBlack)
+        .attr("opacity", opacityStatus)
         .merge(labels)
         .transition()
         .duration(dataDurationTime)
-        .attr("y", (d) => scaleY.yScale(d.cy) - 15);
+        .attr("y", (d) => getLabelsYPosition(d.cy, scales.yScale, radius));
 
       lines.exit().remove();
       circles.exit().remove();

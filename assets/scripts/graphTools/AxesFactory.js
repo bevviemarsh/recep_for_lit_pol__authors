@@ -8,53 +8,41 @@ const { xAxisGroup, yAxisGroup } = groups;
 const { graphWidthProperties, graphHeightProperties } = graphParams;
 const { translate } = graphActions;
 const { axesProperties, colors } = graphProperties;
-const { xAx, yAx, xScl, yScl } = axesProperties;
+const { scls, axs } = axesProperties;
 const { cadet } = colors;
 
 class AxesFactory {
-  createAxes = (type) => {
-    if (type === "xAx") {
-      return new xAxis();
-    } else if (type === "yAx") {
-      return new yAxis();
-    } else if (type === "xScl") {
-      return new xScale();
-    } else if (type === "yScl") {
-      return new yScale();
+  createElements = (type) => {
+    if (type === "scales") {
+      return new Scales();
+    } else if (type === "axes") {
+      return new Axes();
     }
   };
 }
 
-class xAxis {
-  xAxis = xAxisGroup
-    .attr("transform", translate(0, graphHeightProperties.graphHeight))
-    .style("color", cadet);
-}
-
-class yAxis {
-  yAxis = yAxisGroup.style("color", cadet);
-}
-
-class xScale {
+class Scales {
   xScale = d3
     .scaleBand()
     .range([0, graphWidthProperties.graphWidth])
     .padding(1);
-}
 
-class yScale {
   yScale = d3.scaleLinear().range([graphHeightProperties.graphHeight, 0]);
 }
 
-const factory = new AxesFactory();
-const x = factory.createAxes(xAx);
-const y = factory.createAxes(yAx);
-const scaleX = factory.createAxes(xScl);
-const scaleY = factory.createAxes(yScl);
+class Axes {
+  xAxis = xAxisGroup
+    .attr("transform", translate(0, graphHeightProperties.graphHeight))
+    .style("color", cadet);
 
-module.exports.axes = {
-  x,
-  y,
-  scaleX,
-  scaleY,
+  yAxis = yAxisGroup.style("color", cadet);
+}
+
+const factory = new AxesFactory();
+const scales = factory.createElements(scls);
+const axes = factory.createElements(axs);
+
+module.exports.scalesAndAxesElements = {
+  scales,
+  axes,
 };

@@ -64612,7 +64612,7 @@ module.exports=[
     const { graphProperties } = require("./graphTools/GraphProperties");
     const { graphActions } = require("./graphTools/GraphActions");
     const { groups } = require("./graphTools/GraphGroups");
-    const { axes } = require("./graphTools/AxesFactory");
+    const { scalesAndAxesElements } = require("./graphTools/AxesFactory");
 
     const getLollipopChartData = (data) => {
       const { colors, radius } = graphProperties;
@@ -64633,32 +64633,61 @@ module.exports=[
     const renderView = (data) => {
       console.log("data from render", data);
       const { linesGroup, circlesGroup, labelsGroup } = groups;
-      const { x, y, scaleX, scaleY } = axes;
-      const { axesDurationTime, dataDurationTime } = graphProperties;
-      const { rotate } = graphActions;
+      const { scales, axes } = scalesAndAxesElements;
+      const {
+        radius,
+        axesDurationTime,
+        dataDurationTime,
+        colors,
+        axesProperties,
+        labelsProperties,
+        strokeWidth,
+        cursorType,
+      } = graphProperties;
+      const { richBlack } = colors;
+      const {
+        axestextRotateValue,
+        axesTextAnchorPosition,
+        axesFontSize,
+        axesFontWeight,
+      } = axesProperties;
+      const {
+        labelClass,
+        labelTextAnchorPosition,
+        labelFontSizeValue,
+        labelLetterSpacingValue,
+        opacityStatus,
+      } = labelsProperties;
+      const {
+        mapArray,
+        getMaxiumElement,
+        getYAxisDimension,
+        rotate,
+        getLabelsYPosition,
+      } = graphActions;
 
-      scaleX.xScale.domain(data.map((d) => d.x1));
-      scaleY.yScale.domain([
+      scales.xScale.domain(mapArray(data, "x1"));
+      scales.yScale.domain([
         0,
-        Math.ceil(Math.max(...data.map((d) => d.y2)) / 100) * 100,
+        getYAxisDimension(getMaxiumElement(mapArray(data, "y2"))),
       ]);
 
-      x.xAxis
+      axes.xAxis
         .transition()
         .duration(axesDurationTime)
-        .call(d3.axisBottom(scaleX.xScale));
-      x.xAxis
+        .call(d3.axisBottom(scales.xScale));
+      axes.xAxis
         .selectAll("text")
-        .attr("transform", rotate(-45))
-        .attr("text-anchor", "end")
-        .style("font-size", "12px")
-        .style("font-weight", "bold");
+        .attr("transform", rotate(axestextRotateValue))
+        .attr("text-anchor", axesTextAnchorPosition)
+        .style("font-size", axesFontSize)
+        .style("font-weight", axesFontWeight);
 
-      y.yAxis
+      axes.yAxis
         .transition()
         .duration(axesDurationTime)
-        .call(d3.axisLeft(scaleY.yScale).ticks(5));
-      y.yAxis.selectAll("text").style("font-size", "10px");
+        .call(d3.axisLeft(scales.yScale).ticks(5));
+      axes.yAxis.selectAll("text").style("font-size", "10px");
 
       const lines = linesGroup.selectAll("line").data(data, (d) => d.id);
       const circles = circlesGroup.selectAll("circle").data(data, (d) => d.id);
@@ -64667,44 +64696,46 @@ module.exports=[
       lines
         .enter()
         .append("line")
-        .attr("x1", (d) => scaleX.xScale(d.x1))
-        .attr("x2", (d) => scaleX.xScale(d.x2))
-        .attr("y1", scaleY.yScale(0))
-        .attr("y2", scaleY.yScale(0))
+        .attr("x1", (d) => scales.xScale(d.x1))
+        .attr("x2", (d) => scales.xScale(d.x2))
+        .attr("y1", scales.yScale(0))
+        .attr("y2", scales.yScale(0))
         .attr("stroke", (d) => d.lineColor)
-        .attr("stroke-width", 5)
+        .attr("stroke-width", strokeWidth)
         .merge(lines)
         .transition()
         .duration(dataDurationTime)
-        .attr("y2", (d) => scaleY.yScale(d.y2));
+        .attr("y2", (d) => scales.yScale(d.y2));
 
       circles
         .enter()
         .append("circle")
-        .attr("cx", (d) => scaleX.xScale(d.cx))
-        .attr("cy", scaleY.yScale(0))
+        .attr("cx", (d) => scales.xScale(d.cx))
+        .attr("cy", scales.yScale(0))
         .attr("r", (d) => d.r)
         .attr("fill", (d) => d.circleColor)
-        .attr("cursor", "pointer")
+        .attr("cursor", cursorType)
         .merge(circles)
         .transition()
         .duration(dataDurationTime)
-        .attr("cy", (d) => scaleY.yScale(d.cy));
+        .attr("cy", (d) => scales.yScale(d.cy));
 
       labels
         .enter()
         .append("text")
-        // .attr("class", lollipopClass.substr(1))
+        .attr("class", labelClass.substr(1))
         .text((d) => d.text)
-        .attr("x", (d) => scaleX.xScale(d.cx))
-        .attr("y", scaleY.yScale(0))
-        .attr("text-anchor", "middle")
-        .attr("font-size", "15px")
-        .attr("letter-spacing", 1)
+        .attr("x", (d) => scales.xScale(d.cx))
+        .attr("y", scales.yScale(0))
+        .attr("text-anchor", labelTextAnchorPosition)
+        .attr("font-size", labelFontSizeValue)
+        .attr("letter-spacing", labelLetterSpacingValue)
+        .attr("fill", richBlack)
+        .attr("opacity", opacityStatus)
         .merge(labels)
         .transition()
         .duration(dataDurationTime)
-        .attr("y", (d) => scaleY.yScale(d.cy) - 15);
+        .attr("y", (d) => getLabelsYPosition(d.cy, scales.yScale, radius));
 
       lines.exit().remove();
       circles.exit().remove();
@@ -64734,11 +64765,20 @@ module.exports=[
 })();
 
 },{"./dataTools/DataActions":3,"./dataTools/DataProperties":4,"./dataTools/getModifiedData":6,"./graphTools/AxesFactory":7,"./graphTools/GraphActions":9,"./graphTools/GraphGroups":10,"./graphTools/GraphProperties":12,"d3":43}],3:[function(require,module,exports){
+const { graphProperties } = require("../graphTools/GraphProperties");
+
+const { graphMargins } = graphProperties;
+
 class DataActions {
   checkIfTrue = (condition, truthyOption, falsyOption) =>
     condition ? truthyOption : falsyOption;
 
   getItem = (item) => (item ? item : null);
+
+  getXAxisTextDimension = (textItem, marginBottomValue) =>
+    textItem.length < marginBottomValue / 4
+      ? textItem
+      : `${textItem.substr(0, marginBottomValue / 5)}...`;
 
   getHeadOfList = (array) => (array && array.length ? array[0] : null);
 
@@ -64793,13 +64833,13 @@ class ChartDataStructure extends DataActions {
   getLollipopStructure = (array, lineColorName, circleColorName, radiusValue) =>
     array.map((d, i) => ({
       id: i,
-      x1: d.name,
-      x2: d.name,
+      x1: this.getXAxisTextDimension(d.name, graphMargins.bottom),
+      x2: this.getXAxisTextDimension(d.name, graphMargins.bottom),
       y1: 0,
       y2: d.authors,
       lineColor: this.getItem(lineColorName),
       text: d.authors,
-      cx: d.name,
+      cx: this.getXAxisTextDimension(d.name, graphMargins.bottom),
       cy: d.authors,
       r: this.getItem(radiusValue),
       circleColor: this.getItem(circleColorName),
@@ -64812,7 +64852,7 @@ const chartDataStructure = new ChartDataStructure();
 module.exports.dataActions = dataActions;
 module.exports.chartDataStructure = chartDataStructure;
 
-},{}],4:[function(require,module,exports){
+},{"../graphTools/GraphProperties":12}],4:[function(require,module,exports){
 class DataProperties {
   foreignLiteratureProperty = "literatura_obca";
   authors = "authors";
@@ -64867,55 +64907,43 @@ const { xAxisGroup, yAxisGroup } = groups;
 const { graphWidthProperties, graphHeightProperties } = graphParams;
 const { translate } = graphActions;
 const { axesProperties, colors } = graphProperties;
-const { xAx, yAx, xScl, yScl } = axesProperties;
+const { scls, axs } = axesProperties;
 const { cadet } = colors;
 
 class AxesFactory {
-  createAxes = (type) => {
-    if (type === "xAx") {
-      return new xAxis();
-    } else if (type === "yAx") {
-      return new yAxis();
-    } else if (type === "xScl") {
-      return new xScale();
-    } else if (type === "yScl") {
-      return new yScale();
+  createElements = (type) => {
+    if (type === "scales") {
+      return new Scales();
+    } else if (type === "axes") {
+      return new Axes();
     }
   };
 }
 
-class xAxis {
-  xAxis = xAxisGroup
-    .attr("transform", translate(0, graphHeightProperties.graphHeight))
-    .style("color", cadet);
-}
-
-class yAxis {
-  yAxis = yAxisGroup.style("color", cadet);
-}
-
-class xScale {
+class Scales {
   xScale = d3
     .scaleBand()
     .range([0, graphWidthProperties.graphWidth])
     .padding(1);
-}
 
-class yScale {
   yScale = d3.scaleLinear().range([graphHeightProperties.graphHeight, 0]);
 }
 
-const factory = new AxesFactory();
-const x = factory.createAxes(xAx);
-const y = factory.createAxes(yAx);
-const scaleX = factory.createAxes(xScl);
-const scaleY = factory.createAxes(yScl);
+class Axes {
+  xAxis = xAxisGroup
+    .attr("transform", translate(0, graphHeightProperties.graphHeight))
+    .style("color", cadet);
 
-module.exports.axes = {
-  x,
-  y,
-  scaleX,
-  scaleY,
+  yAxis = yAxisGroup.style("color", cadet);
+}
+
+const factory = new AxesFactory();
+const scales = factory.createElements(scls);
+const axes = factory.createElements(axs);
+
+module.exports.scalesAndAxesElements = {
+  scales,
+  axes,
 };
 
 },{"./GraphActions":9,"./GraphGroups":10,"./GraphParams":11,"./GraphProperties":12,"d3":43}],8:[function(require,module,exports){
@@ -64957,12 +64985,35 @@ module.exports.Graph = class Graph {
 class GraphActions {
   getElementById = (idValue) => document.getElementById(idValue);
 
-  translate = (xValue, yValue) =>
-    typeof xValue !== "number" || typeof yValue !== "number"
-      ? `translate(0, 0)`
-      : `translate(${xValue}, ${yValue})`;
+  mapArray = (array, dataElement) =>
+    array && array.length && typeof dataElement === "string"
+      ? array.map((d) => d[dataElement])
+      : 0;
 
-  rotate = (num) => (typeof num !== "number" ? `rotate(0)` : `rotate(${num})`);
+  getMaxiumElement = (array) =>
+    array && array.length ? Math.max(...array) : 0;
+
+  getYAxisDimension = (value) => {
+    if (value && typeof value === "number" && value >= 0 && value < 1000) {
+      return Math.ceil(value / 100) * 100;
+    } else if (value && typeof value === "number" && value >= 1000) {
+      return Math.ceil(value / 1000) * 1000;
+    } else {
+      return 0;
+    }
+  };
+
+  translate = (xValue, yValue) =>
+    typeof xValue === "number" || typeof yValue === "number"
+      ? `translate(${xValue}, ${yValue})`
+      : `translate(0, 0)`;
+
+  rotate = (num) => (typeof num === "number" ? `rotate(${num})` : `rotate(0)`);
+
+  getLabelsYPosition = (item, scaleFn, rValue) =>
+    item && scaleFn && typeof rValue === "number"
+      ? scaleFn(item) - rValue * 1.5
+      : null;
 }
 
 const graphActions = new GraphActions();
@@ -65063,10 +65114,12 @@ class GraphProperties {
   };
 
   axesProperties = {
-    xAx: "xAx",
-    yAx: "yAx",
-    xScl: "xScl",
-    yScl: "yScl",
+    scls: "scales",
+    axs: "axes",
+    axestextRotateValue: -45,
+    axesTextAnchorPosition: "end",
+    axesFontSize: "12px",
+    axesFontWeight: "bold",
   };
 
   colors = {
@@ -65077,12 +65130,23 @@ class GraphProperties {
   };
 
   margin = 10;
-  graphMargins = { top: 80, left: 20, right: 90, bottom: 100 };
+  graphMargins = { top: 80, left: 20, right: 90, bottom: 120 };
 
   axesDurationTime = 200;
   dataDurationTime = 300;
 
+  strokeWidth = 5;
   radius = 10;
+
+  labelsProperties = {
+    labelClass: ".labelClass",
+    labelTextAnchorPosition: "middle",
+    labelFontSizeValue: "15px",
+    labelLetterSpacingValue: 1,
+    opacityStatus: "visible",
+  };
+
+  cursorType = "pointer";
 }
 
 const graphProperties = new GraphProperties();

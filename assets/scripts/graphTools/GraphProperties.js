@@ -8,10 +8,12 @@ class GraphProperties {
   };
 
   axesProperties = {
-    xAx: "xAx",
-    yAx: "yAx",
-    xScl: "xScl",
-    yScl: "yScl",
+    scls: "scales",
+    axs: "axes",
+    axestextRotateValue: -45,
+    axesTextAnchorPosition: "end",
+    axesFontSize: "12px",
+    axesFontWeight: "bold",
   };
 
   colors = {
@@ -22,12 +24,23 @@ class GraphProperties {
   };
 
   margin = 10;
-  graphMargins = { top: 80, left: 20, right: 90, bottom: 100 };
+  graphMargins = { top: 80, left: 20, right: 90, bottom: 120 };
 
   axesDurationTime = 200;
   dataDurationTime = 300;
 
+  strokeWidth = 5;
   radius = 10;
+
+  labelsProperties = {
+    labelClass: ".labelClass",
+    labelTextAnchorPosition: "middle",
+    labelFontSizeValue: "15px",
+    labelLetterSpacingValue: 1,
+    opacityStatus: "visible",
+  };
+
+  cursorType = "pointer";
 }
 
 const graphProperties = new GraphProperties();
