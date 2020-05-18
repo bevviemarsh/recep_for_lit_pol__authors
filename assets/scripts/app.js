@@ -24,7 +24,7 @@
           dataForLollipopChart,
           queenBlue,
           fireEngineRed,
-          radius
+          radius(dataForLollipopChart)
         )
       );
     };
@@ -85,14 +85,14 @@
         .selectAll("text")
         .attr("transform", rotate(axesTextRotateValue))
         .attr("text-anchor", axesTextAnchorPosition)
-        .style("font-size", axesFontSize)
+        .style("font-size", axesFontSize(data))
         .style("font-weight", axesFontWeight);
 
       axes.yAxis
         .transition()
         .duration(axesDurationTime)
         .call(d3.axisLeft(scales.yScale).ticks(5));
-      axes.yAxis.selectAll("text").style("font-size", axesFontSize);
+      axes.yAxis.selectAll("text").style("font-size", axesFontSize(data));
 
       const lines = linesGroup.selectAll("line").data(data, (d) => d.id);
       const circles = circlesGroup.selectAll("circle").data(data, (d) => d.id);
@@ -106,7 +106,7 @@
         .attr("y1", scales.yScale(0))
         .attr("y2", scales.yScale(0))
         .attr("stroke", (d) => d.lineColor)
-        .attr("stroke-width", strokeWidth)
+        .attr("stroke-width", strokeWidth(data))
         .merge(lines)
         .transition()
         .duration(dataDurationTime)
@@ -133,14 +133,16 @@
         .attr("x", (d) => scales.xScale(d.cx))
         .attr("y", scales.yScale(0))
         .attr("text-anchor", labelTextAnchorPosition)
-        .attr("font-size", labelFontSizeValue)
+        .attr("font-size", labelFontSizeValue(data))
         .attr("letter-spacing", labelLetterSpacingValue)
         .attr("fill", richBlack)
         .attr("opacity", opacityStatus)
         .merge(labels)
         .transition()
         .duration(dataDurationTime)
-        .attr("y", (d) => getLabelsYPosition(d.cy, scales.yScale, radius));
+        .attr("y", (d) =>
+          getLabelsYPosition(d.cy, scales.yScale, radius(data))
+        );
 
       lines.exit().remove();
       circles.exit().remove();

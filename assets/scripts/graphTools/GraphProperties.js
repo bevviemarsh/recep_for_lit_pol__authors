@@ -12,7 +12,15 @@ class GraphProperties {
     axs: "axes",
     axesTextRotateValue: -45,
     axesTextAnchorPosition: "end",
-    axesFontSize: "1vw",
+    axesFontSize: (array) => {
+      if (array.length < 25) {
+        return "1vw";
+      } else if (array.length < 50) {
+        return "0.8vw";
+      } else {
+        return "0.5vw";
+      }
+    },
     axesFontWeight: "bold",
   };
 
@@ -29,13 +37,37 @@ class GraphProperties {
   axesDurationTime = 200;
   dataDurationTime = 300;
 
-  strokeWidth = 5;
-  radius = 10;
+  strokeWidth = (array) => {
+    if (array.length < 25) {
+      return 5;
+    } else if (array.length < 50) {
+      return 3;
+    } else {
+      return 1;
+    }
+  };
+  radius = (array) => {
+    if (array.length < 25) {
+      return 10;
+    } else if (array.length < 50) {
+      return 7;
+    } else {
+      return 4;
+    }
+  };
 
   labelsProperties = {
     labelClass: ".labelClass",
     labelTextAnchorPosition: "middle",
-    labelFontSizeValue: "1.5vw",
+    labelFontSizeValue: (array) => {
+      if (array.length < 25) {
+        return "1.5vw";
+      } else if (array.length < 50) {
+        return "1vw";
+      } else {
+        return "0";
+      }
+    },
     labelLetterSpacingValue: 1,
     opacityStatus: "visible",
   };

@@ -64625,7 +64625,7 @@ module.exports=[
           dataForLollipopChart,
           queenBlue,
           fireEngineRed,
-          radius
+          radius(dataForLollipopChart)
         )
       );
     };
@@ -64686,14 +64686,14 @@ module.exports=[
         .selectAll("text")
         .attr("transform", rotate(axesTextRotateValue))
         .attr("text-anchor", axesTextAnchorPosition)
-        .style("font-size", axesFontSize)
+        .style("font-size", axesFontSize(data))
         .style("font-weight", axesFontWeight);
 
       axes.yAxis
         .transition()
         .duration(axesDurationTime)
         .call(d3.axisLeft(scales.yScale).ticks(5));
-      axes.yAxis.selectAll("text").style("font-size", axesFontSize);
+      axes.yAxis.selectAll("text").style("font-size", axesFontSize(data));
 
       const lines = linesGroup.selectAll("line").data(data, (d) => d.id);
       const circles = circlesGroup.selectAll("circle").data(data, (d) => d.id);
@@ -64707,7 +64707,7 @@ module.exports=[
         .attr("y1", scales.yScale(0))
         .attr("y2", scales.yScale(0))
         .attr("stroke", (d) => d.lineColor)
-        .attr("stroke-width", strokeWidth)
+        .attr("stroke-width", strokeWidth(data))
         .merge(lines)
         .transition()
         .duration(dataDurationTime)
@@ -64734,14 +64734,16 @@ module.exports=[
         .attr("x", (d) => scales.xScale(d.cx))
         .attr("y", scales.yScale(0))
         .attr("text-anchor", labelTextAnchorPosition)
-        .attr("font-size", labelFontSizeValue)
+        .attr("font-size", labelFontSizeValue(data))
         .attr("letter-spacing", labelLetterSpacingValue)
         .attr("fill", richBlack)
         .attr("opacity", opacityStatus)
         .merge(labels)
         .transition()
         .duration(dataDurationTime)
-        .attr("y", (d) => getLabelsYPosition(d.cy, scales.yScale, radius));
+        .attr("y", (d) =>
+          getLabelsYPosition(d.cy, scales.yScale, radius(data))
+        );
 
       lines.exit().remove();
       circles.exit().remove();
@@ -65130,7 +65132,15 @@ class GraphProperties {
     axs: "axes",
     axesTextRotateValue: -45,
     axesTextAnchorPosition: "end",
-    axesFontSize: "1vw",
+    axesFontSize: (array) => {
+      if (array.length < 25) {
+        return "1vw";
+      } else if (array.length < 50) {
+        return "0.8vw";
+      } else {
+        return "0.5vw";
+      }
+    },
     axesFontWeight: "bold",
   };
 
@@ -65147,13 +65157,37 @@ class GraphProperties {
   axesDurationTime = 200;
   dataDurationTime = 300;
 
-  strokeWidth = 5;
-  radius = 10;
+  strokeWidth = (array) => {
+    if (array.length < 25) {
+      return 5;
+    } else if (array.length < 50) {
+      return 3;
+    } else {
+      return 1;
+    }
+  };
+  radius = (array) => {
+    if (array.length < 25) {
+      return 10;
+    } else if (array.length < 50) {
+      return 7;
+    } else {
+      return 4;
+    }
+  };
 
   labelsProperties = {
     labelClass: ".labelClass",
     labelTextAnchorPosition: "middle",
-    labelFontSizeValue: "1.5vw",
+    labelFontSizeValue: (array) => {
+      if (array.length < 25) {
+        return "1.5vw";
+      } else if (array.length < 50) {
+        return "1vw";
+      } else {
+        return "0";
+      }
+    },
     labelLetterSpacingValue: 1,
     opacityStatus: "visible",
   };
