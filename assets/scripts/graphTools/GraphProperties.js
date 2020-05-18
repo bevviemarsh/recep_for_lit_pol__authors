@@ -10,9 +10,9 @@ class GraphProperties {
   axesProperties = {
     scls: "scales",
     axs: "axes",
-    axestextRotateValue: -45,
+    axesTextRotateValue: -45,
     axesTextAnchorPosition: "end",
-    axesFontSize: "12px",
+    axesFontSize: "1vw",
     axesFontWeight: "bold",
   };
 
@@ -24,7 +24,7 @@ class GraphProperties {
   };
 
   margin = 10;
-  graphMargins = { top: 80, left: 20, right: 90, bottom: 120 };
+  graphMargins = { top: 80, left: 20, right: 90, bottom: 100 };
 
   axesDurationTime = 200;
   dataDurationTime = 300;
@@ -35,7 +35,7 @@ class GraphProperties {
   labelsProperties = {
     labelClass: ".labelClass",
     labelTextAnchorPosition: "middle",
-    labelFontSizeValue: "15px",
+    labelFontSizeValue: "1.5vw",
     labelLetterSpacingValue: 1,
     opacityStatus: "visible",
   };

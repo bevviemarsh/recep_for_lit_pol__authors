@@ -8,6 +8,7 @@ const {
   margin,
   graphMargins,
 } = graphProperties;
+const { top, left, right, bottom } = graphMargins;
 const { width, height, position } = graphParamsProperties;
 
 class GraphPropertyFactory {
@@ -33,17 +34,17 @@ const graphContainer = new GraphContainer(graphId);
 class GraphWidthProperty {
   basicWidth = graphContainer.mainContainer.offsetWidth;
   svgWidth = this.basicWidth - margin;
-  graphWidth = this.svgWidth - graphMargins.left - graphMargins.right;
+  graphWidth = this.svgWidth - left - right;
 }
 
 class GraphHeightProperty {
   basicHeight = graphContainer.mainContainer.offsetHeight;
   svgHeight = this.basicHeight - margin;
-  graphHeight = this.svgHeight - graphMargins.top - graphMargins.bottom;
+  graphHeight = this.svgHeight - top - bottom;
 }
 
 class GraphPositionProperty {
-  graphPosition = translate(graphMargins.right, graphMargins.top);
+  graphPosition = translate(right, top);
 }
 
 const factory = new GraphPropertyFactory();

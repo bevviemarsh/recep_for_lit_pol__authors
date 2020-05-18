@@ -64643,10 +64643,11 @@ module.exports=[
         labelsProperties,
         strokeWidth,
         cursorType,
+        graphMargins,
       } = graphProperties;
       const { richBlack } = colors;
       const {
-        axestextRotateValue,
+        axesTextRotateValue,
         axesTextAnchorPosition,
         axesFontSize,
         axesFontWeight,
@@ -64659,6 +64660,7 @@ module.exports=[
         opacityStatus,
       } = labelsProperties;
       const {
+        getXAxisTextDimension,
         mapArray,
         getMaxiumElement,
         getYAxisDimension,
@@ -64675,10 +64677,14 @@ module.exports=[
       axes.xAxis
         .transition()
         .duration(axesDurationTime)
-        .call(d3.axisBottom(scales.xScale));
+        .call(
+          d3
+            .axisBottom(scales.xScale)
+            .tickFormat((d) => getXAxisTextDimension(d, graphMargins.bottom))
+        );
       axes.xAxis
         .selectAll("text")
-        .attr("transform", rotate(axestextRotateValue))
+        .attr("transform", rotate(axesTextRotateValue))
         .attr("text-anchor", axesTextAnchorPosition)
         .style("font-size", axesFontSize)
         .style("font-weight", axesFontWeight);
@@ -64687,7 +64693,7 @@ module.exports=[
         .transition()
         .duration(axesDurationTime)
         .call(d3.axisLeft(scales.yScale).ticks(5));
-      axes.yAxis.selectAll("text").style("font-size", "10px");
+      axes.yAxis.selectAll("text").style("font-size", axesFontSize);
 
       const lines = linesGroup.selectAll("line").data(data, (d) => d.id);
       const circles = circlesGroup.selectAll("circle").data(data, (d) => d.id);
@@ -64765,20 +64771,11 @@ module.exports=[
 })();
 
 },{"./dataTools/DataActions":3,"./dataTools/DataProperties":4,"./dataTools/getModifiedData":6,"./graphTools/AxesFactory":7,"./graphTools/GraphActions":9,"./graphTools/GraphGroups":10,"./graphTools/GraphProperties":12,"d3":43}],3:[function(require,module,exports){
-const { graphProperties } = require("../graphTools/GraphProperties");
-
-const { graphMargins } = graphProperties;
-
 class DataActions {
   checkIfTrue = (condition, truthyOption, falsyOption) =>
     condition ? truthyOption : falsyOption;
 
   getItem = (item) => (item ? item : null);
-
-  getXAxisTextDimension = (textItem, marginBottomValue) =>
-    textItem.length < marginBottomValue / 4
-      ? textItem
-      : `${textItem.substr(0, marginBottomValue / 5)}...`;
 
   getHeadOfList = (array) => (array && array.length ? array[0] : null);
 
@@ -64833,16 +64830,17 @@ class ChartDataStructure extends DataActions {
   getLollipopStructure = (array, lineColorName, circleColorName, radiusValue) =>
     array.map((d, i) => ({
       id: i,
-      x1: this.getXAxisTextDimension(d.name, graphMargins.bottom),
-      x2: this.getXAxisTextDimension(d.name, graphMargins.bottom),
+      x1: d.name,
+      x2: d.name,
       y1: 0,
       y2: d.authors,
       lineColor: this.getItem(lineColorName),
       text: d.authors,
-      cx: this.getXAxisTextDimension(d.name, graphMargins.bottom),
+      cx: d.name,
       cy: d.authors,
       r: this.getItem(radiusValue),
       circleColor: this.getItem(circleColorName),
+      tooltipText: d.name,
     }));
 }
 
@@ -64852,7 +64850,7 @@ const chartDataStructure = new ChartDataStructure();
 module.exports.dataActions = dataActions;
 module.exports.chartDataStructure = chartDataStructure;
 
-},{"../graphTools/GraphProperties":12}],4:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 class DataProperties {
   foreignLiteratureProperty = "literatura_obca";
   authors = "authors";
@@ -64985,6 +64983,11 @@ module.exports.Graph = class Graph {
 class GraphActions {
   getElementById = (idValue) => document.getElementById(idValue);
 
+  getXAxisTextDimension = (textItem, marginBottomValue) =>
+    textItem.length < marginBottomValue / 5
+      ? textItem
+      : `${textItem.substr(0, marginBottomValue / 6)}...`;
+
   mapArray = (array, dataElement) =>
     array && array.length && typeof dataElement === "string"
       ? array.map((d) => d[dataElement])
@@ -65053,6 +65056,7 @@ const {
   margin,
   graphMargins,
 } = graphProperties;
+const { top, left, right, bottom } = graphMargins;
 const { width, height, position } = graphParamsProperties;
 
 class GraphPropertyFactory {
@@ -65078,17 +65082,17 @@ const graphContainer = new GraphContainer(graphId);
 class GraphWidthProperty {
   basicWidth = graphContainer.mainContainer.offsetWidth;
   svgWidth = this.basicWidth - margin;
-  graphWidth = this.svgWidth - graphMargins.left - graphMargins.right;
+  graphWidth = this.svgWidth - left - right;
 }
 
 class GraphHeightProperty {
   basicHeight = graphContainer.mainContainer.offsetHeight;
   svgHeight = this.basicHeight - margin;
-  graphHeight = this.svgHeight - graphMargins.top - graphMargins.bottom;
+  graphHeight = this.svgHeight - top - bottom;
 }
 
 class GraphPositionProperty {
-  graphPosition = translate(graphMargins.right, graphMargins.top);
+  graphPosition = translate(right, top);
 }
 
 const factory = new GraphPropertyFactory();
@@ -65116,9 +65120,9 @@ class GraphProperties {
   axesProperties = {
     scls: "scales",
     axs: "axes",
-    axestextRotateValue: -45,
+    axesTextRotateValue: -45,
     axesTextAnchorPosition: "end",
-    axesFontSize: "12px",
+    axesFontSize: "1vw",
     axesFontWeight: "bold",
   };
 
@@ -65130,7 +65134,7 @@ class GraphProperties {
   };
 
   margin = 10;
-  graphMargins = { top: 80, left: 20, right: 90, bottom: 120 };
+  graphMargins = { top: 80, left: 20, right: 90, bottom: 100 };
 
   axesDurationTime = 200;
   dataDurationTime = 300;
@@ -65141,7 +65145,7 @@ class GraphProperties {
   labelsProperties = {
     labelClass: ".labelClass",
     labelTextAnchorPosition: "middle",
-    labelFontSizeValue: "15px",
+    labelFontSizeValue: "1.5vw",
     labelLetterSpacingValue: 1,
     opacityStatus: "visible",
   };

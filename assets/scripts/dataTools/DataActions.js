@@ -1,17 +1,8 @@
-const { graphProperties } = require("../graphTools/GraphProperties");
-
-const { graphMargins } = graphProperties;
-
 class DataActions {
   checkIfTrue = (condition, truthyOption, falsyOption) =>
     condition ? truthyOption : falsyOption;
 
   getItem = (item) => (item ? item : null);
-
-  getXAxisTextDimension = (textItem, marginBottomValue) =>
-    textItem.length < marginBottomValue / 4
-      ? textItem
-      : `${textItem.substr(0, marginBottomValue / 5)}...`;
 
   getHeadOfList = (array) => (array && array.length ? array[0] : null);
 
@@ -66,16 +57,17 @@ class ChartDataStructure extends DataActions {
   getLollipopStructure = (array, lineColorName, circleColorName, radiusValue) =>
     array.map((d, i) => ({
       id: i,
-      x1: this.getXAxisTextDimension(d.name, graphMargins.bottom),
-      x2: this.getXAxisTextDimension(d.name, graphMargins.bottom),
+      x1: d.name,
+      x2: d.name,
       y1: 0,
       y2: d.authors,
       lineColor: this.getItem(lineColorName),
       text: d.authors,
-      cx: this.getXAxisTextDimension(d.name, graphMargins.bottom),
+      cx: d.name,
       cy: d.authors,
       r: this.getItem(radiusValue),
       circleColor: this.getItem(circleColorName),
+      tooltipText: d.name,
     }));
 }
 

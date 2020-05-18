@@ -42,10 +42,11 @@
         labelsProperties,
         strokeWidth,
         cursorType,
+        graphMargins,
       } = graphProperties;
       const { richBlack } = colors;
       const {
-        axestextRotateValue,
+        axesTextRotateValue,
         axesTextAnchorPosition,
         axesFontSize,
         axesFontWeight,
@@ -58,6 +59,7 @@
         opacityStatus,
       } = labelsProperties;
       const {
+        getXAxisTextDimension,
         mapArray,
         getMaxiumElement,
         getYAxisDimension,
@@ -74,10 +76,14 @@
       axes.xAxis
         .transition()
         .duration(axesDurationTime)
-        .call(d3.axisBottom(scales.xScale));
+        .call(
+          d3
+            .axisBottom(scales.xScale)
+            .tickFormat((d) => getXAxisTextDimension(d, graphMargins.bottom))
+        );
       axes.xAxis
         .selectAll("text")
-        .attr("transform", rotate(axestextRotateValue))
+        .attr("transform", rotate(axesTextRotateValue))
         .attr("text-anchor", axesTextAnchorPosition)
         .style("font-size", axesFontSize)
         .style("font-weight", axesFontWeight);
@@ -86,7 +92,7 @@
         .transition()
         .duration(axesDurationTime)
         .call(d3.axisLeft(scales.yScale).ticks(5));
-      axes.yAxis.selectAll("text").style("font-size", "10px");
+      axes.yAxis.selectAll("text").style("font-size", axesFontSize);
 
       const lines = linesGroup.selectAll("line").data(data, (d) => d.id);
       const circles = circlesGroup.selectAll("circle").data(data, (d) => d.id);

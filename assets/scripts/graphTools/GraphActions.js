@@ -1,6 +1,11 @@
 class GraphActions {
   getElementById = (idValue) => document.getElementById(idValue);
 
+  getXAxisTextDimension = (textItem, marginBottomValue) =>
+    textItem.length < marginBottomValue / 5
+      ? textItem
+      : `${textItem.substr(0, marginBottomValue / 6)}...`;
+
   mapArray = (array, dataElement) =>
     array && array.length && typeof dataElement === "string"
       ? array.map((d) => d[dataElement])
