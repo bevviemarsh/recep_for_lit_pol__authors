@@ -64754,10 +64754,9 @@ module.exports=[
 
     return { runChart: getLollipopChartData };
   })();
-  document
-    .querySelectorAll("input")
-    .forEach((input) =>
-      input.addEventListener("change", (e) =>
+  document.querySelectorAll("input").forEach((input, i) =>
+    input.addEventListener("change", (e) => {
+      if (e.target.checked) {
         lollipopChart.runChart(
           getFilteredByProperty(
             modifiedData,
@@ -64765,9 +64764,18 @@ module.exports=[
             checkIfTrue(e.target.checked, e.target.dataset.range, 0),
             dataProperties.authors
           )
-        )
-      )
-    );
+        );
+
+        document
+          .querySelectorAll("input")
+          .forEach((input) => (input.checked = false));
+        e.target.checked = true;
+      } else {
+        lollipopChart.runChart([]);
+      }
+    })
+  );
+  lollipopChart.runChart([]);
 })();
 
 },{"./dataTools/DataActions":3,"./dataTools/DataProperties":4,"./dataTools/getModifiedData":6,"./graphTools/AxesFactory":7,"./graphTools/GraphActions":9,"./graphTools/GraphGroups":10,"./graphTools/GraphProperties":12,"d3":43}],3:[function(require,module,exports){
@@ -64829,7 +64837,7 @@ class ChartDataStructure extends DataActions {
 
   getLollipopStructure = (array, lineColorName, circleColorName, radiusValue) =>
     array.map((d, i) => ({
-      id: i,
+      id: `${d.name}-${i}`,
       x1: d.name,
       x2: d.name,
       y1: 0,

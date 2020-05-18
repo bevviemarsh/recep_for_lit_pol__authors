@@ -153,10 +153,9 @@
 
     return { runChart: getLollipopChartData };
   })();
-  document
-    .querySelectorAll("input")
-    .forEach((input) =>
-      input.addEventListener("change", (e) =>
+  document.querySelectorAll("input").forEach((input, i) =>
+    input.addEventListener("change", (e) => {
+      if (e.target.checked) {
         lollipopChart.runChart(
           getFilteredByProperty(
             modifiedData,
@@ -164,7 +163,16 @@
             checkIfTrue(e.target.checked, e.target.dataset.range, 0),
             dataProperties.authors
           )
-        )
-      )
-    );
+        );
+
+        document
+          .querySelectorAll("input")
+          .forEach((input) => (input.checked = false));
+        e.target.checked = true;
+      } else {
+        lollipopChart.runChart([]);
+      }
+    })
+  );
+  lollipopChart.runChart([]);
 })();

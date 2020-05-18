@@ -56,7 +56,7 @@ class ChartDataStructure extends DataActions {
 
   getLollipopStructure = (array, lineColorName, circleColorName, radiusValue) =>
     array.map((d, i) => ({
-      id: i,
+      id: `${d.name}-${i}`,
       x1: d.name,
       x2: d.name,
       y1: 0,
