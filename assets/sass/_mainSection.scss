@@ -124,6 +124,12 @@
       outline: none;
     }
 
+    &--labels.active,
+    &--clear.active {
+      color: $lightBrown;
+      animation: buttonsAnimation 0.2s;
+    }
+
     &--names {
       @include widthAndHeightParams(90%, 70%);
       background-color: $light;
@@ -144,5 +150,19 @@
       @include fontParams($smallFontSize, $letterSpacing, lighter, $light);
       text-transform: uppercase;
     }
+  }
+}
+
+@keyframes buttonsAnimation {
+  0% {
+    box-shadow: $boxShadowValues;
+  }
+
+  50% {
+    box-shadow: $boxShadowAnimatedValues;
+  }
+
+  100% {
+    box-shadow: $boxShadowValues;
   }
 }

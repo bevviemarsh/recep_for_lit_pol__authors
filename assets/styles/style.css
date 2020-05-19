@@ -223,6 +223,12 @@ body {
   outline: none;
 }
 
+.main__info--labels.active, .main__info--clear.active {
+  color: #b0a18f;
+  -webkit-animation: buttonsAnimation 0.2s;
+          animation: buttonsAnimation 0.2s;
+}
+
 .main__info--names {
   width: 90%;
   height: 70%;
@@ -281,5 +287,35 @@ body {
   font-weight: lighter;
   color: #f3f0ec;
   text-transform: uppercase;
+}
+
+@-webkit-keyframes buttonsAnimation {
+  0% {
+    -webkit-box-shadow: -2px 2px 5px 2px #333334;
+            box-shadow: -2px 2px 5px 2px #333334;
+  }
+  50% {
+    -webkit-box-shadow: 0px 0px 0px 1px #333334;
+            box-shadow: 0px 0px 0px 1px #333334;
+  }
+  100% {
+    -webkit-box-shadow: -2px 2px 5px 2px #333334;
+            box-shadow: -2px 2px 5px 2px #333334;
+  }
+}
+
+@keyframes buttonsAnimation {
+  0% {
+    -webkit-box-shadow: -2px 2px 5px 2px #333334;
+            box-shadow: -2px 2px 5px 2px #333334;
+  }
+  50% {
+    -webkit-box-shadow: 0px 0px 0px 1px #333334;
+            box-shadow: 0px 0px 0px 1px #333334;
+  }
+  100% {
+    -webkit-box-shadow: -2px 2px 5px 2px #333334;
+            box-shadow: -2px 2px 5px 2px #333334;
+  }
 }
 /*# sourceMappingURL=style.css.map */

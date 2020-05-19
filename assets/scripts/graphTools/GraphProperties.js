@@ -36,6 +36,7 @@ class GraphProperties {
 
   axesDurationTime = 200;
   dataDurationTime = 300;
+  labelDurationTime = 250;
 
   strokeWidth = (array) => {
     if (array.length < 25) {
@@ -69,7 +70,8 @@ class GraphProperties {
       }
     },
     labelLetterSpacingValue: 1,
-    opacityStatus: "visible",
+    opacityStatus: 0,
+    clickedLabel: true,
   };
 
   cursorType = "pointer";

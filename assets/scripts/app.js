@@ -2,6 +2,8 @@
   const { dataActions } = require("./dataTools/DataActions");
   const { modifiedData } = require("./dataTools/getModifiedData");
   const { dataProperties } = require("./dataTools/DataProperties");
+  const { handleLabels } = require("./chartEvents/handleLabels");
+  const { graphProperties } = require("./graphTools/GraphProperties");
 
   const { getFilteredByProperty, checkIfTrue } = dataActions;
 
@@ -177,4 +179,5 @@
     })
   );
   lollipopChart.runChart([]);
+  handleLabels();
 })();
