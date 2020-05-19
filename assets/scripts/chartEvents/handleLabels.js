@@ -1,13 +1,13 @@
 const d3 = require("d3");
+const { elements } = require("./DOMElements");
 const { graphProperties } = require("../graphTools/GraphProperties");
 const { graphActions } = require("../graphTools/GraphActions");
 
+const { labelBtn } = elements;
 const { getAnimatedBtn } = graphActions;
 
 const handleLabels = () => {
   const { labelsProperties, labelDurationTime } = graphProperties;
-
-  const btn = document.querySelector(".main__info--labels");
 
   const getDisplayedLabels = () => {
     d3.selectAll(labelsProperties.labelClass)
@@ -21,12 +21,12 @@ const handleLabels = () => {
       );
   };
 
-  btn.addEventListener("click", (e) => {
+  labelBtn.addEventListener("click", (e) => {
     getDisplayedLabels(e);
     getAnimatedBtn(e.target, "active");
     labelsProperties.clickedLabel = !labelsProperties.clickedLabel;
 
-    setTimeout(() => btn.classList.remove("active"), 210);
+    setTimeout(() => labelBtn.classList.remove("active"), 210);
   });
 };
 

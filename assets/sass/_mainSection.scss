@@ -105,7 +105,8 @@
   }
 
   &__info {
-    @include areaParams(info, $lightBrown, space-between, start, column);
+    @include areaParams(info, $lightBrown, space-around, center, column);
+    overflow: hidden;
 
     &--labels,
     &--clear {
@@ -133,7 +134,19 @@
       @include widthAndHeightParams(90%, 70%);
       background-color: $light;
       box-shadow: $boxShadowValues;
-      overflow-y: scroll;
+      @include fontParams($smallFontSize, $letterSpacing, normal, $richBlack);
+      text-align: center;
+      line-height: 2.5vw;
+      overflow-y: auto;
+    }
+
+    &--names::-webkit-scrollbar {
+      width: 1.2vw;
+      background: $darkBrown;
+    }
+
+    &--names::-webkit-scrollbar-thumb {
+      background: $lightBrown;
     }
   }
 
@@ -150,14 +163,6 @@
       text-transform: uppercase;
     }
   }
-}
-
-.tip {
-  padding: 1vw;
-  color: $light;
-  background-color: $richBlack;
-  letter-spacing: $letterSpacing;
-  opacity: 1;
 }
 
 @keyframes buttonsAnimation {

@@ -1,17 +1,24 @@
+const { elements } = require("./DOMElements");
 const { graphActions } = require("../graphTools/GraphActions");
+const { groups } = require("../graphTools/GraphGroups");
 
+const { clearBtn } = elements;
 const { getAnimatedBtn } = graphActions;
+const { circlesGroup } = groups;
 
 const handleClearingData = () => {
-  const btn = document.querySelector(".main__info--clear");
+  const getAllDataCleared = () => {
+    document.querySelector(".main__info--names").innerHTML = "";
+    circlesGroup
+      .selectAll("circle")
+      .each((d, i, n) => n[i].classList.remove("activeCircle"));
+  };
 
-  const getAllDataCleared = () => {};
-
-  btn.addEventListener("click", (e) => {
+  clearBtn.addEventListener("click", (e) => {
     getAllDataCleared();
     getAnimatedBtn(e.target, "active");
 
-    setTimeout(() => btn.classList.remove("active"), 210);
+    setTimeout(() => clearBtn.classList.remove("active"), 210);
   });
 };
 

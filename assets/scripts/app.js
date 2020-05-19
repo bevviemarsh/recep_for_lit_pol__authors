@@ -1,12 +1,17 @@
 (function IIFE() {
-  const { dataActions } = require("./dataTools/DataActions");
+  const { elements } = require("./chartEvents/DOMElements");
   const { modifiedData } = require("./dataTools/getModifiedData");
+  const { dataActions } = require("./dataTools/DataActions");
   const { dataProperties } = require("./dataTools/DataProperties");
   const { handleLabels } = require("./chartEvents/handleLabels");
   const { handleClearingData } = require("./chartEvents/handleClearingData");
   const { handleTooltips } = require("./chartEvents/handleTooltips");
+  const { handleDisplayData } = require("./chartEvents/handleDisplayData");
 
+  const { inputs } = elements;
+  const { literatureType, literatureInfo } = modifiedData;
   const { getFilteredByProperty, checkIfTrue } = dataActions;
+  const { authors } = dataProperties;
 
   const lollipopChart = (function () {
     const d3 = require("d3");
@@ -16,15 +21,17 @@
     const { groups } = require("./graphTools/GraphGroups");
     const { scalesAndAxesElements } = require("./graphTools/AxesFactory");
 
-    const getLollipopChartData = (data) => {
+    const getLollipopChartData = (mainData, additionalData) => {
       const { colors, radius } = graphProperties;
       const { fireEngineRed, queenBlue } = colors;
 
-      const dataForLollipopChart = data;
+      const dataForLollipopChart = mainData;
+      const dataForDisplayContainer = additionalData;
 
       getUpdatedChart(
         chartDataStructure.getLollipopStructure(
           dataForLollipopChart,
+          dataForDisplayContainer,
           queenBlue,
           fireEngineRed,
           radius(dataForLollipopChart)
@@ -158,26 +165,25 @@
 
     return { runChart: getLollipopChartData };
   })();
-  document.querySelectorAll("input").forEach((input) =>
+  inputs.forEach((input) =>
     input.addEventListener("change", (e) => {
       if (e.target.checked) {
         lollipopChart.runChart(
           getFilteredByProperty(
-            modifiedData,
+            literatureType,
             checkIfTrue(e.target.checked, e.target.value, 0),
             checkIfTrue(e.target.checked, e.target.dataset.range, 0),
-            dataProperties.authors
-          )
+            authors
+          ),
+          literatureInfo
         );
 
-        document
-          .querySelectorAll("input")
-          .forEach((input) => (input.checked = false));
+        inputs.forEach((input) => (input.checked = false));
         e.target.checked = true;
         handleTooltips();
+        handleDisplayData();
       } else {
         lollipopChart.runChart([]);
-        handleTooltips();
       }
     })
   );

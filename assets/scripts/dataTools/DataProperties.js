@@ -1,6 +1,10 @@
 class DataProperties {
-  foreignLiteratureProperty = "literatura_obca";
+  foreignLiteratureTypeProperty = "literatura_obca";
+  foreignLiteratureIdProperty = "literatura_id";
+  type = "type";
   authors = "authors";
+  id = "id";
+  info = "info";
 }
 
 const dataProperties = new DataProperties();

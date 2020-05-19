@@ -8,7 +8,10 @@ const { circlesGroup } = groups;
 const { margin } = graphProperties;
 
 const handleTooltips = () => {
-  const getTooltipContent = (d) => `<div>${d.tooltipText}</div>`;
+  const getTooltipContent = (d) =>
+    d.r > 5
+      ? `<div>${d.tooltipText}</div>`
+      : `<div>${d.tooltipText}: ${d.cy}</div>`;
 
   tip
     .attr("class", "tip")

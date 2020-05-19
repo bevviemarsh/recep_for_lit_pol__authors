@@ -64600,14 +64600,19 @@ module.exports=[
    
 },{}],2:[function(require,module,exports){
 (function IIFE() {
-  const { dataActions } = require("./dataTools/DataActions");
+  const { elements } = require("./chartEvents/DOMElements");
   const { modifiedData } = require("./dataTools/getModifiedData");
+  const { dataActions } = require("./dataTools/DataActions");
   const { dataProperties } = require("./dataTools/DataProperties");
   const { handleLabels } = require("./chartEvents/handleLabels");
   const { handleClearingData } = require("./chartEvents/handleClearingData");
   const { handleTooltips } = require("./chartEvents/handleTooltips");
+  const { handleDisplayData } = require("./chartEvents/handleDisplayData");
 
+  const { inputs } = elements;
+  const { literatureType, literatureInfo } = modifiedData;
   const { getFilteredByProperty, checkIfTrue } = dataActions;
+  const { authors } = dataProperties;
 
   const lollipopChart = (function () {
     const d3 = require("d3");
@@ -64617,15 +64622,17 @@ module.exports=[
     const { groups } = require("./graphTools/GraphGroups");
     const { scalesAndAxesElements } = require("./graphTools/AxesFactory");
 
-    const getLollipopChartData = (data) => {
+    const getLollipopChartData = (mainData, additionalData) => {
       const { colors, radius } = graphProperties;
       const { fireEngineRed, queenBlue } = colors;
 
-      const dataForLollipopChart = data;
+      const dataForLollipopChart = mainData;
+      const dataForDisplayContainer = additionalData;
 
       getUpdatedChart(
         chartDataStructure.getLollipopStructure(
           dataForLollipopChart,
+          dataForDisplayContainer,
           queenBlue,
           fireEngineRed,
           radius(dataForLollipopChart)
@@ -64759,26 +64766,25 @@ module.exports=[
 
     return { runChart: getLollipopChartData };
   })();
-  document.querySelectorAll("input").forEach((input) =>
+  inputs.forEach((input) =>
     input.addEventListener("change", (e) => {
       if (e.target.checked) {
         lollipopChart.runChart(
           getFilteredByProperty(
-            modifiedData,
+            literatureType,
             checkIfTrue(e.target.checked, e.target.value, 0),
             checkIfTrue(e.target.checked, e.target.dataset.range, 0),
-            dataProperties.authors
-          )
+            authors
+          ),
+          literatureInfo
         );
 
-        document
-          .querySelectorAll("input")
-          .forEach((input) => (input.checked = false));
+        inputs.forEach((input) => (input.checked = false));
         e.target.checked = true;
         handleTooltips();
+        handleDisplayData();
       } else {
         lollipopChart.runChart([]);
-        handleTooltips();
       }
     })
   );
@@ -64787,37 +64793,91 @@ module.exports=[
   handleClearingData();
 })();
 
-},{"./chartEvents/handleClearingData":3,"./chartEvents/handleLabels":4,"./chartEvents/handleTooltips":5,"./dataTools/DataActions":6,"./dataTools/DataProperties":7,"./dataTools/getModifiedData":9,"./graphTools/AxesFactory":10,"./graphTools/GraphActions":12,"./graphTools/GraphGroups":13,"./graphTools/GraphProperties":15,"d3":47}],3:[function(require,module,exports){
-const { graphActions } = require("../graphTools/GraphActions");
+},{"./chartEvents/DOMElements":3,"./chartEvents/handleClearingData":4,"./chartEvents/handleDisplayData":5,"./chartEvents/handleLabels":6,"./chartEvents/handleTooltips":7,"./dataTools/DataActions":8,"./dataTools/DataProperties":9,"./dataTools/getModifiedData":11,"./graphTools/AxesFactory":12,"./graphTools/GraphActions":14,"./graphTools/GraphGroups":15,"./graphTools/GraphProperties":17,"d3":49}],3:[function(require,module,exports){
+class DOMElements {
+  inputs = document.querySelectorAll("input");
+  labelBtn = document.querySelector(".main__info--labels");
+  clearBtn = document.querySelector(".main__info--clear");
+  authorsDetails = document.querySelector(".main__info--names");
+}
 
+const elements = new DOMElements();
+
+module.exports.elements = elements;
+
+},{}],4:[function(require,module,exports){
+const { elements } = require("./DOMElements");
+const { graphActions } = require("../graphTools/GraphActions");
+const { groups } = require("../graphTools/GraphGroups");
+
+const { clearBtn } = elements;
 const { getAnimatedBtn } = graphActions;
+const { circlesGroup } = groups;
 
 const handleClearingData = () => {
-  const btn = document.querySelector(".main__info--clear");
+  const getAllDataCleared = () => {
+    document.querySelector(".main__info--names").innerHTML = "";
+    circlesGroup
+      .selectAll("circle")
+      .each((d, i, n) => n[i].classList.remove("activeCircle"));
+  };
 
-  const getAllDataCleared = () => {};
-
-  btn.addEventListener("click", (e) => {
+  clearBtn.addEventListener("click", (e) => {
     getAllDataCleared();
     getAnimatedBtn(e.target, "active");
 
-    setTimeout(() => btn.classList.remove("active"), 210);
+    setTimeout(() => clearBtn.classList.remove("active"), 210);
   });
 };
 
 module.exports.handleClearingData = handleClearingData;
 
-},{"../graphTools/GraphActions":12}],4:[function(require,module,exports){
+},{"../graphTools/GraphActions":14,"../graphTools/GraphGroups":15,"./DOMElements":3}],5:[function(require,module,exports){
+const { elements } = require("./DOMElements");
+const { groups } = require("../graphTools/GraphGroups");
+
+const { authorsDetails } = elements;
+const { circlesGroup } = groups;
+
+const handleDisplayData = () => {
+  const getAuthorsDetails = (d) => {
+    authorsDetails.innerHTML = d.authorsDetails.info
+      .map(
+        (data) =>
+          `<div><span class="details">${data.tworca_imie}</span> <span class="details">${data.tworca_nazwisko}</span></div>`
+      )
+      .join("");
+  };
+
+  const handleBarsData = (e, item, data) => {
+    item.forEach((circle) => circle.classList.remove("activeCircle"));
+    e.target.classList.add("activeCircle");
+    getAuthorsDetails(data);
+  };
+
+  circlesGroup.selectAll("circle").each((d, i, n) => {
+    n[i].addEventListener("click", (e) => {
+      if (n[i].classList.contains("activeCircle")) {
+        return;
+      }
+      handleBarsData(e, n, d);
+    });
+  });
+};
+
+module.exports.handleDisplayData = handleDisplayData;
+
+},{"../graphTools/GraphGroups":15,"./DOMElements":3}],6:[function(require,module,exports){
 const d3 = require("d3");
+const { elements } = require("./DOMElements");
 const { graphProperties } = require("../graphTools/GraphProperties");
 const { graphActions } = require("../graphTools/GraphActions");
 
+const { labelBtn } = elements;
 const { getAnimatedBtn } = graphActions;
 
 const handleLabels = () => {
   const { labelsProperties, labelDurationTime } = graphProperties;
-
-  const btn = document.querySelector(".main__info--labels");
 
   const getDisplayedLabels = () => {
     d3.selectAll(labelsProperties.labelClass)
@@ -64831,18 +64891,18 @@ const handleLabels = () => {
       );
   };
 
-  btn.addEventListener("click", (e) => {
+  labelBtn.addEventListener("click", (e) => {
     getDisplayedLabels(e);
     getAnimatedBtn(e.target, "active");
     labelsProperties.clickedLabel = !labelsProperties.clickedLabel;
 
-    setTimeout(() => btn.classList.remove("active"), 210);
+    setTimeout(() => labelBtn.classList.remove("active"), 210);
   });
 };
 
 module.exports.handleLabels = handleLabels;
 
-},{"../graphTools/GraphActions":12,"../graphTools/GraphProperties":15,"d3":47}],5:[function(require,module,exports){
+},{"../graphTools/GraphActions":14,"../graphTools/GraphProperties":17,"./DOMElements":3,"d3":49}],7:[function(require,module,exports){
 const d3 = require("d3");
 const d3tip = require("d3-tip");
 const { groups } = require("../graphTools/GraphGroups");
@@ -64853,7 +64913,10 @@ const { circlesGroup } = groups;
 const { margin } = graphProperties;
 
 const handleTooltips = () => {
-  const getTooltipContent = (d) => `<div>${d.tooltipText}</div>`;
+  const getTooltipContent = (d) =>
+    d.r > 5
+      ? `<div>${d.tooltipText}</div>`
+      : `<div>${d.tooltipText}: ${d.cy}</div>`;
 
   tip
     .attr("class", "tip")
@@ -64869,7 +64932,7 @@ const handleTooltips = () => {
 
 module.exports.handleTooltips = handleTooltips;
 
-},{"../graphTools/GraphGroups":13,"../graphTools/GraphProperties":15,"d3":47,"d3-tip":43}],6:[function(require,module,exports){
+},{"../graphTools/GraphGroups":15,"../graphTools/GraphProperties":17,"d3":49,"d3-tip":45}],8:[function(require,module,exports){
 class DataActions {
   checkIfTrue = (condition, truthyOption, falsyOption) =>
     condition ? truthyOption : falsyOption;
@@ -64899,11 +64962,11 @@ class DataActions {
       ? Object.entries(objectName)
       : [];
 
-  getCountedAuthorsStructure = (array, headFn, tailFn) =>
+  getDataStructure = (array, headFn, tailFn, keyValue, propertyValue) =>
     array && array.length && headFn && tailFn
       ? array.map((d) => ({
-          name: headFn(d),
-          authors: tailFn(d),
+          [`${keyValue}`]: headFn(d),
+          [`${propertyValue}`]: tailFn(d),
         }))
       : [];
 
@@ -64919,6 +64982,16 @@ class DataActions {
           return lits;
         }, {})
       : {};
+
+  getGroupedDataById = (array, propertyName) =>
+    array.reduce((acc, obj) => {
+      let key = obj[propertyName];
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(obj);
+      return acc;
+    }, {});
 }
 
 class ChartDataStructure extends DataActions {
@@ -64926,20 +64999,29 @@ class ChartDataStructure extends DataActions {
     super();
   }
 
-  getLollipopStructure = (array, lineColorName, circleColorName, radiusValue) =>
-    array.map((d, i) => ({
-      id: `${d.name}-${i}-${array.length}`,
-      x1: d.name,
-      x2: d.name,
+  getLollipopStructure = (
+    mainArray,
+    additionalArray,
+    lineColorName,
+    circleColorName,
+    radiusValue
+  ) =>
+    mainArray.map((d, i) => ({
+      id: `${d.type}-${i}-${mainArray.length}`,
+      x1: d.type,
+      x2: d.type,
       y1: 0,
       y2: d.authors,
       lineColor: this.getItem(lineColorName),
       text: d.authors,
-      cx: d.name,
+      cx: d.type,
       cy: d.authors,
       r: this.getItem(radiusValue),
       circleColor: this.getItem(circleColorName),
-      tooltipText: d.name,
+      tooltipText: d.type,
+      authorsDetails: additionalArray.find(
+        (dd) => dd.info.length === d.authors
+      ),
     }));
 }
 
@@ -64949,51 +65031,76 @@ const chartDataStructure = new ChartDataStructure();
 module.exports.dataActions = dataActions;
 module.exports.chartDataStructure = chartDataStructure;
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 class DataProperties {
-  foreignLiteratureProperty = "literatura_obca";
+  foreignLiteratureTypeProperty = "literatura_obca";
+  foreignLiteratureIdProperty = "literatura_id";
+  type = "type";
   authors = "authors";
+  id = "id";
+  info = "info";
 }
 
 const dataProperties = new DataProperties();
 
 module.exports.dataProperties = dataProperties;
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports.DATA = require("../../data/data.json");
 
-},{"../../data/data.json":1}],9:[function(require,module,exports){
+},{"../../data/data.json":1}],11:[function(require,module,exports){
 const { DATA } = require("./authors");
 const { dataProperties } = require("./DataProperties");
 const { dataActions } = require("./DataActions");
 
-const { foreignLiteratureProperty, authors } = dataProperties;
+const {
+  foreignLiteratureTypeProperty,
+  foreignLiteratureIdProperty,
+  type,
+  authors,
+  id,
+  info,
+} = dataProperties;
 const {
   getHeadOfList,
   getTailOfList,
   getSortedData,
   getArrayFromObject,
-  getCountedAuthorsStructure,
+  getDataStructure,
   getLiteraturesTypes,
   getNumberOfAuthors,
+  getGroupedDataById,
 } = dataActions;
 
 const authorsData = DATA;
 
-module.exports.modifiedData = getSortedData(
-  getCountedAuthorsStructure(
+module.exports.modifiedData = {
+  literatureType: getSortedData(
+    getDataStructure(
+      getArrayFromObject(
+        getNumberOfAuthors(
+          getLiteraturesTypes(authorsData, foreignLiteratureTypeProperty)
+        )
+      ),
+      getHeadOfList,
+      getTailOfList,
+      type,
+      authors
+    ),
+    authors
+  ),
+  literatureInfo: getDataStructure(
     getArrayFromObject(
-      getNumberOfAuthors(
-        getLiteraturesTypes(authorsData, foreignLiteratureProperty)
-      )
+      getGroupedDataById(authorsData, foreignLiteratureIdProperty)
     ),
     getHeadOfList,
-    getTailOfList
+    getTailOfList,
+    id,
+    info
   ),
-  authors
-);
+};
 
-},{"./DataActions":6,"./DataProperties":7,"./authors":8}],10:[function(require,module,exports){
+},{"./DataActions":8,"./DataProperties":9,"./authors":10}],12:[function(require,module,exports){
 const d3 = require("d3");
 const { groups } = require("./GraphGroups");
 const { graphParams } = require("./GraphParams");
@@ -65043,7 +65150,7 @@ module.exports.scalesAndAxesElements = {
   axes,
 };
 
-},{"./GraphActions":12,"./GraphGroups":13,"./GraphParams":14,"./GraphProperties":15,"d3":47}],11:[function(require,module,exports){
+},{"./GraphActions":14,"./GraphGroups":15,"./GraphParams":16,"./GraphProperties":17,"d3":49}],13:[function(require,module,exports){
 const d3 = require("d3");
 const { graphParams } = require("./GraphParams");
 
@@ -65078,7 +65185,7 @@ module.exports.Graph = class Graph {
   }
 };
 
-},{"./GraphParams":14,"d3":47}],12:[function(require,module,exports){
+},{"./GraphParams":16,"d3":49}],14:[function(require,module,exports){
 class GraphActions {
   getElementById = (idValue) => document.getElementById(idValue);
 
@@ -65124,7 +65231,7 @@ const graphActions = new GraphActions();
 
 module.exports.graphActions = graphActions;
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 const { Graph } = require("./Graph");
 const { graphParams } = require("./GraphParams");
 
@@ -65146,7 +65253,7 @@ const groups = new GraphGroups(chart.mainChart);
 
 module.exports.groups = groups;
 
-},{"./Graph":11,"./GraphParams":14}],14:[function(require,module,exports){
+},{"./Graph":13,"./GraphParams":16}],16:[function(require,module,exports){
 const { graphActions } = require("./GraphActions");
 const { graphProperties } = require("./GraphProperties");
 
@@ -65208,7 +65315,7 @@ module.exports.graphParams = {
   graphPositionProperties,
 };
 
-},{"./GraphActions":12,"./GraphProperties":15}],15:[function(require,module,exports){
+},{"./GraphActions":14,"./GraphProperties":17}],17:[function(require,module,exports){
 class GraphProperties {
   graphId = "graph";
 
@@ -65258,9 +65365,10 @@ class GraphProperties {
       return 1;
     }
   };
+
   radius = (array) => {
     if (array.length < 25) {
-      return 10;
+      return 12;
     } else if (array.length < 50) {
       return 7;
     } else {
@@ -65292,7 +65400,7 @@ const graphProperties = new GraphProperties();
 
 module.exports.graphProperties = graphProperties;
 
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 // https://d3js.org/d3-array/ v1.2.4 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -65884,7 +65992,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 // https://d3js.org/d3-axis/ v1.0.12 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -66079,7 +66187,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 // https://d3js.org/d3-brush/ v1.1.5 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-dispatch'), require('d3-drag'), require('d3-interpolate'), require('d3-selection'), require('d3-transition')) :
@@ -66698,7 +66806,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-dispatch":23,"d3-drag":24,"d3-interpolate":32,"d3-selection":38,"d3-transition":44}],19:[function(require,module,exports){
+},{"d3-dispatch":25,"d3-drag":26,"d3-interpolate":34,"d3-selection":40,"d3-transition":46}],21:[function(require,module,exports){
 // https://d3js.org/d3-chord/ v1.0.6 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array'), require('d3-path')) :
@@ -66930,7 +67038,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-array":16,"d3-path":33}],20:[function(require,module,exports){
+},{"d3-array":18,"d3-path":35}],22:[function(require,module,exports){
 // https://d3js.org/d3-collection/ v1.0.7 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -67149,7 +67257,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 // https://d3js.org/d3-color/ v1.4.1 Copyright 2020 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -67732,7 +67840,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 // https://d3js.org/d3-contour/ v1.3.2 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array')) :
@@ -68165,7 +68273,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-array":16}],23:[function(require,module,exports){
+},{"d3-array":18}],25:[function(require,module,exports){
 // https://d3js.org/d3-dispatch/ v1.0.6 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -68262,7 +68370,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 // https://d3js.org/d3-drag/ v1.2.5 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-dispatch'), require('d3-selection')) :
@@ -68498,7 +68606,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-dispatch":23,"d3-selection":38}],25:[function(require,module,exports){
+},{"d3-dispatch":25,"d3-selection":40}],27:[function(require,module,exports){
 // https://d3js.org/d3-dsv/ v1.2.0 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -68733,7 +68841,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 // https://d3js.org/d3-ease/ v1.0.6 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -68994,7 +69102,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 // https://d3js.org/d3-fetch/ v1.1.2 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-dsv')) :
@@ -69098,7 +69206,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-dsv":25}],28:[function(require,module,exports){
+},{"d3-dsv":27}],30:[function(require,module,exports){
 // https://d3js.org/d3-force/ v1.2.1 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-quadtree'), require('d3-collection'), require('d3-dispatch'), require('d3-timer')) :
@@ -69768,7 +69876,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-collection":20,"d3-dispatch":23,"d3-quadtree":35,"d3-timer":42}],29:[function(require,module,exports){
+},{"d3-collection":22,"d3-dispatch":25,"d3-quadtree":37,"d3-timer":44}],31:[function(require,module,exports){
 // https://d3js.org/d3-format/ v1.4.4 Copyright 2020 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -70109,7 +70217,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],30:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 // https://d3js.org/d3-geo/ v1.12.0 Copyright 2020 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array')) :
@@ -73280,7 +73388,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-array":16}],31:[function(require,module,exports){
+},{"d3-array":18}],33:[function(require,module,exports){
 // https://d3js.org/d3-hierarchy/ v1.1.9 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -74572,7 +74680,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 // https://d3js.org/d3-interpolate/ v1.4.0 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-color')) :
@@ -75167,7 +75275,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-color":21}],33:[function(require,module,exports){
+},{"d3-color":23}],35:[function(require,module,exports){
 // https://d3js.org/d3-path/ v1.0.9 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -75310,7 +75418,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],34:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 // https://d3js.org/d3-polygon/ v1.0.6 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -75462,7 +75570,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 // https://d3js.org/d3-quadtree/ v1.0.7 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -75883,7 +75991,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 // https://d3js.org/d3-random/ v1.1.2 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -76000,7 +76108,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 // https://d3js.org/d3-scale-chromatic/ v1.5.0 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-interpolate'), require('d3-color')) :
@@ -76523,7 +76631,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-color":21,"d3-interpolate":32}],38:[function(require,module,exports){
+},{"d3-color":23,"d3-interpolate":34}],40:[function(require,module,exports){
 // https://d3js.org/d3-selection/ v1.4.1 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -77514,7 +77622,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 // https://d3js.org/d3-shape/ v1.3.7 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-path')) :
@@ -79465,7 +79573,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-path":33}],40:[function(require,module,exports){
+},{"d3-path":35}],42:[function(require,module,exports){
 // https://d3js.org/d3-time-format/ v2.2.3 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-time')) :
@@ -80174,7 +80282,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-time":41}],41:[function(require,module,exports){
+},{"d3-time":43}],43:[function(require,module,exports){
 // https://d3js.org/d3-time/ v1.1.0 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -80549,7 +80657,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],42:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 // https://d3js.org/d3-timer/ v1.0.10 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -80700,7 +80808,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('d3-collection'), require('d3-selection')) :
   typeof define === 'function' && define.amd ? define(['d3-collection', 'd3-selection'], factory) :
@@ -81040,7 +81148,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-collection":20,"d3-selection":38}],44:[function(require,module,exports){
+},{"d3-collection":22,"d3-selection":40}],46:[function(require,module,exports){
 // https://d3js.org/d3-transition/ v1.3.2 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-dispatch'), require('d3-timer'), require('d3-interpolate'), require('d3-color'), require('d3-ease')) :
@@ -81922,7 +82030,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-color":21,"d3-dispatch":23,"d3-ease":26,"d3-interpolate":32,"d3-selection":38,"d3-timer":42}],45:[function(require,module,exports){
+},{"d3-color":23,"d3-dispatch":25,"d3-ease":28,"d3-interpolate":34,"d3-selection":40,"d3-timer":44}],47:[function(require,module,exports){
 // https://d3js.org/d3-voronoi/ v1.1.4 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -82923,7 +83031,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{}],46:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 // https://d3js.org/d3-zoom/ v1.8.3 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-dispatch'), require('d3-drag'), require('d3-interpolate'), require('d3-selection'), require('d3-transition')) :
@@ -83422,7 +83530,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-dispatch":23,"d3-drag":24,"d3-interpolate":32,"d3-selection":38,"d3-transition":44}],47:[function(require,module,exports){
+},{"d3-dispatch":25,"d3-drag":26,"d3-interpolate":34,"d3-selection":40,"d3-transition":46}],49:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -83711,7 +83819,7 @@ Object.keys(d3Zoom).forEach(function (k) {
 });
 exports.version = version;
 
-},{"d3-array":16,"d3-axis":17,"d3-brush":18,"d3-chord":19,"d3-collection":20,"d3-color":21,"d3-contour":22,"d3-dispatch":23,"d3-drag":24,"d3-dsv":25,"d3-ease":26,"d3-fetch":27,"d3-force":28,"d3-format":29,"d3-geo":30,"d3-hierarchy":31,"d3-interpolate":32,"d3-path":33,"d3-polygon":34,"d3-quadtree":35,"d3-random":36,"d3-scale":48,"d3-scale-chromatic":37,"d3-selection":38,"d3-shape":39,"d3-time":41,"d3-time-format":40,"d3-timer":42,"d3-transition":44,"d3-voronoi":45,"d3-zoom":46}],48:[function(require,module,exports){
+},{"d3-array":18,"d3-axis":19,"d3-brush":20,"d3-chord":21,"d3-collection":22,"d3-color":23,"d3-contour":24,"d3-dispatch":25,"d3-drag":26,"d3-dsv":27,"d3-ease":28,"d3-fetch":29,"d3-force":30,"d3-format":31,"d3-geo":32,"d3-hierarchy":33,"d3-interpolate":34,"d3-path":35,"d3-polygon":36,"d3-quadtree":37,"d3-random":38,"d3-scale":50,"d3-scale-chromatic":39,"d3-selection":40,"d3-shape":41,"d3-time":43,"d3-time-format":42,"d3-timer":44,"d3-transition":46,"d3-voronoi":47,"d3-zoom":48}],50:[function(require,module,exports){
 // https://d3js.org/d3-scale/ v2.2.2 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-collection'), require('d3-array'), require('d3-interpolate'), require('d3-format'), require('d3-time'), require('d3-time-format')) :
@@ -84878,4 +84986,4 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-array":16,"d3-collection":20,"d3-format":29,"d3-interpolate":32,"d3-time":41,"d3-time-format":40}]},{},[2]);
+},{"d3-array":18,"d3-collection":22,"d3-format":31,"d3-interpolate":34,"d3-time":43,"d3-time-format":42}]},{},[2]);

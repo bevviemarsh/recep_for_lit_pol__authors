@@ -47,9 +47,10 @@ class GraphProperties {
       return 1;
     }
   };
+
   radius = (array) => {
     if (array.length < 25) {
-      return 10;
+      return 12;
     } else if (array.length < 50) {
       return 7;
     } else {

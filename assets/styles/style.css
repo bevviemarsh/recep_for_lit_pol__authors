@@ -191,16 +191,16 @@ body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -webkit-box-align: start;
-      -ms-flex-align: start;
-          align-items: start;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
+  overflow: hidden;
 }
 
 .main__info--labels, .main__info--clear {
@@ -234,7 +234,22 @@ body {
   background-color: #f3f0ec;
   -webkit-box-shadow: -2px 2px 5px 2px #333334;
           box-shadow: -2px 2px 5px 2px #333334;
-  overflow-y: scroll;
+  font-size: 1vw;
+  letter-spacing: 0.1em;
+  font-weight: normal;
+  color: #02111b;
+  text-align: center;
+  line-height: 2.5vw;
+  overflow-y: auto;
+}
+
+.main__info--names::-webkit-scrollbar {
+  width: 1.2vw;
+  background: #333334;
+}
+
+.main__info--names::-webkit-scrollbar-thumb {
+  background: #b0a18f;
 }
 
 .main__graph {
@@ -288,14 +303,6 @@ body {
   text-transform: uppercase;
 }
 
-.tip {
-  padding: 1vw;
-  color: #f3f0ec;
-  background-color: #02111b;
-  letter-spacing: 0.1em;
-  opacity: 1;
-}
-
 @-webkit-keyframes buttonsAnimation {
   0% {
     -webkit-box-shadow: -2px 2px 5px 2px #333334;
@@ -324,5 +331,21 @@ body {
     -webkit-box-shadow: -2px 2px 5px 2px #333334;
             box-shadow: -2px 2px 5px 2px #333334;
   }
+}
+
+.tip {
+  padding: 1vw;
+  color: #f3f0ec;
+  background-color: #02111b;
+  letter-spacing: 0.1em;
+  opacity: 1;
+}
+
+.activeCircle {
+  fill: #4c6085;
+}
+
+.details {
+  margin: 0.1vw;
 }
 /*# sourceMappingURL=style.css.map */

@@ -27,11 +27,11 @@ class DataActions {
       ? Object.entries(objectName)
       : [];
 
-  getCountedAuthorsStructure = (array, headFn, tailFn) =>
+  getDataStructure = (array, headFn, tailFn, keyValue, propertyValue) =>
     array && array.length && headFn && tailFn
       ? array.map((d) => ({
-          name: headFn(d),
-          authors: tailFn(d),
+          [`${keyValue}`]: headFn(d),
+          [`${propertyValue}`]: tailFn(d),
         }))
       : [];
 
@@ -47,6 +47,16 @@ class DataActions {
           return lits;
         }, {})
       : {};
+
+  getGroupedDataById = (array, propertyName) =>
+    array.reduce((acc, obj) => {
+      let key = obj[propertyName];
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(obj);
+      return acc;
+    }, {});
 }
 
 class ChartDataStructure extends DataActions {
@@ -54,20 +64,29 @@ class ChartDataStructure extends DataActions {
     super();
   }
 
-  getLollipopStructure = (array, lineColorName, circleColorName, radiusValue) =>
-    array.map((d, i) => ({
-      id: `${d.name}-${i}-${array.length}`,
-      x1: d.name,
-      x2: d.name,
+  getLollipopStructure = (
+    mainArray,
+    additionalArray,
+    lineColorName,
+    circleColorName,
+    radiusValue
+  ) =>
+    mainArray.map((d, i) => ({
+      id: `${d.type}-${i}-${mainArray.length}`,
+      x1: d.type,
+      x2: d.type,
       y1: 0,
       y2: d.authors,
       lineColor: this.getItem(lineColorName),
       text: d.authors,
-      cx: d.name,
+      cx: d.type,
       cy: d.authors,
       r: this.getItem(radiusValue),
       circleColor: this.getItem(circleColorName),
-      tooltipText: d.name,
+      tooltipText: d.type,
+      authorsDetails: additionalArray.find(
+        (dd) => dd.info.length === d.authors
+      ),
     }));
 }
 
