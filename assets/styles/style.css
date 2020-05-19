@@ -291,9 +291,8 @@ body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
@@ -309,6 +308,7 @@ body {
   font-weight: lighter;
   color: #f3f0ec;
   text-transform: uppercase;
+  text-decoration: none;
 }
 
 @-webkit-keyframes buttonsAnimation {

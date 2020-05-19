@@ -167,11 +167,12 @@
   }
 
   &__footer {
-    @include areaParams(footer, $darkBrown, center, center, row);
+    @include areaParams(footer, $darkBrown, space-around, center, row);
 
     &--info {
       @include fontParams($smallFontSize, $letterSpacing, lighter, $light);
       text-transform: uppercase;
+      text-decoration: none;
     }
   }
 }
