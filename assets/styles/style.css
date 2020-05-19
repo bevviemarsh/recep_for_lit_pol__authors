@@ -203,7 +203,7 @@ body {
   overflow: hidden;
 }
 
-.main__info--labels, .main__info--clear {
+.main__info--labels, .main__info--clear, .main__info--search {
   width: 90%;
   height: 10%;
   background-color: #f3f0ec;
@@ -216,10 +216,18 @@ body {
   font-weight: bold;
   color: #333334;
   text-transform: uppercase;
+  text-align: center;
+}
+
+.main__info--labels, .main__info--clear {
   cursor: pointer;
 }
 
-.main__info--labels:focus, .main__info--clear:focus {
+.main__info--search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.main__info--labels:focus, .main__info--clear:focus, .main__info--search:focus {
   outline: none;
 }
 
@@ -230,7 +238,7 @@ body {
 
 .main__info--names {
   width: 90%;
-  height: 70%;
+  height: 60%;
   background-color: #f3f0ec;
   -webkit-box-shadow: -2px 2px 5px 2px #333334;
           box-shadow: -2px 2px 5px 2px #333334;

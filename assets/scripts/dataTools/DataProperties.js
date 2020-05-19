@@ -5,6 +5,8 @@ class DataProperties {
   authors = "authors";
   id = "id";
   info = "info";
+  authorFirstName = "tworca_imie";
+  authorLastName = "tworca_nazwisko";
 }
 
 const dataProperties = new DataProperties();

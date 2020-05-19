@@ -1,17 +1,22 @@
 const { elements } = require("./DOMElements");
 const { groups } = require("../graphTools/GraphGroups");
+const { dataProperties } = require("../dataTools/DataProperties");
+const { handleSearching } = require("./handleSearching");
 
 const { authorsDetails } = elements;
 const { circlesGroup } = groups;
+const { authorFirstName, authorLastName } = dataProperties;
 
 const handleDisplayData = () => {
   const getAuthorsDetails = (d) => {
     authorsDetails.innerHTML = d.authorsDetails.info
       .map(
         (data) =>
-          `<div><span class="details">${data.tworca_imie}</span> <span class="details">${data.tworca_nazwisko}</span></div>`
+          `<ul><li class="details">${data[authorFirstName]} ${data[authorLastName]}</li></ul>`
       )
       .join("");
+
+    handleSearching(document.querySelectorAll(".details"));
   };
 
   const handleBarsData = (e, item, data) => {

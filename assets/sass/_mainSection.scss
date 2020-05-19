@@ -109,7 +109,8 @@
     overflow: hidden;
 
     &--labels,
-    &--clear {
+    &--clear,
+    &--search {
       @include widthAndHeightParams(90%, 10%);
       background-color: $light;
       border: none;
@@ -117,11 +118,21 @@
       font-family: $mainFontFamily;
       @include fontParams($mediumFontSize, $letterSpacing, bold, $darkBrown);
       text-transform: uppercase;
+      text-align: center;
+    }
+
+    &--labels,
+    &--clear {
       cursor: pointer;
     }
 
+    &--search::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+    }
+
     &--labels:focus,
-    &--clear:focus {
+    &--clear:focus,
+    &--search:focus {
       outline: none;
     }
 
@@ -131,7 +142,7 @@
     }
 
     &--names {
-      @include widthAndHeightParams(90%, 70%);
+      @include widthAndHeightParams(90%, 60%);
       background-color: $light;
       box-shadow: $boxShadowValues;
       @include fontParams($smallFontSize, $letterSpacing, normal, $richBlack);
