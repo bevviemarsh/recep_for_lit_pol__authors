@@ -3,7 +3,8 @@
   const { modifiedData } = require("./dataTools/getModifiedData");
   const { dataProperties } = require("./dataTools/DataProperties");
   const { handleLabels } = require("./chartEvents/handleLabels");
-  const { graphProperties } = require("./graphTools/GraphProperties");
+  const { handleClearingData } = require("./chartEvents/handleClearingData");
+  const { handleTooltips } = require("./chartEvents/handleTooltips");
 
   const { getFilteredByProperty, checkIfTrue } = dataActions;
 
@@ -157,7 +158,7 @@
 
     return { runChart: getLollipopChartData };
   })();
-  document.querySelectorAll("input").forEach((input, i) =>
+  document.querySelectorAll("input").forEach((input) =>
     input.addEventListener("change", (e) => {
       if (e.target.checked) {
         lollipopChart.runChart(
@@ -173,11 +174,14 @@
           .querySelectorAll("input")
           .forEach((input) => (input.checked = false));
         e.target.checked = true;
+        handleTooltips();
       } else {
         lollipopChart.runChart([]);
+        handleTooltips();
       }
     })
   );
   lollipopChart.runChart([]);
   handleLabels();
+  handleClearingData();
 })();

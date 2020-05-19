@@ -126,7 +126,6 @@
 
     &--labels.active,
     &--clear.active {
-      color: $lightBrown;
       animation: buttonsAnimation 0.2s;
     }
 
@@ -151,6 +150,14 @@
       text-transform: uppercase;
     }
   }
+}
+
+.tip {
+  padding: 1vw;
+  color: $light;
+  background-color: $richBlack;
+  letter-spacing: $letterSpacing;
+  opacity: 1;
 }
 
 @keyframes buttonsAnimation {

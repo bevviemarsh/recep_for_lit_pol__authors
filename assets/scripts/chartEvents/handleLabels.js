@@ -1,5 +1,8 @@
 const d3 = require("d3");
 const { graphProperties } = require("../graphTools/GraphProperties");
+const { graphActions } = require("../graphTools/GraphActions");
+
+const { getAnimatedBtn } = graphActions;
 
 const handleLabels = () => {
   const { labelsProperties, labelDurationTime } = graphProperties;
@@ -18,12 +21,12 @@ const handleLabels = () => {
       );
   };
 
-  const getToggleButtonClass = (e) => e.target.classList.toggle("active");
-
   btn.addEventListener("click", (e) => {
     getDisplayedLabels(e);
-    getToggleButtonClass(e);
+    getAnimatedBtn(e.target, "active");
     labelsProperties.clickedLabel = !labelsProperties.clickedLabel;
+
+    setTimeout(() => btn.classList.remove("active"), 210);
   });
 };
 

@@ -35,6 +35,8 @@ class GraphActions {
     item && scaleFn && typeof rValue === "number"
       ? scaleFn(item) - rValue * 1.5
       : null;
+
+  getAnimatedBtn = (item, className) => item.classList.add(className);
 }
 
 const graphActions = new GraphActions();

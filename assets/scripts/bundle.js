@@ -64604,7 +64604,8 @@ module.exports=[
   const { modifiedData } = require("./dataTools/getModifiedData");
   const { dataProperties } = require("./dataTools/DataProperties");
   const { handleLabels } = require("./chartEvents/handleLabels");
-  const { graphProperties } = require("./graphTools/GraphProperties");
+  const { handleClearingData } = require("./chartEvents/handleClearingData");
+  const { handleTooltips } = require("./chartEvents/handleTooltips");
 
   const { getFilteredByProperty, checkIfTrue } = dataActions;
 
@@ -64758,7 +64759,7 @@ module.exports=[
 
     return { runChart: getLollipopChartData };
   })();
-  document.querySelectorAll("input").forEach((input, i) =>
+  document.querySelectorAll("input").forEach((input) =>
     input.addEventListener("change", (e) => {
       if (e.target.checked) {
         lollipopChart.runChart(
@@ -64774,18 +64775,44 @@ module.exports=[
           .querySelectorAll("input")
           .forEach((input) => (input.checked = false));
         e.target.checked = true;
+        handleTooltips();
       } else {
         lollipopChart.runChart([]);
+        handleTooltips();
       }
     })
   );
   lollipopChart.runChart([]);
   handleLabels();
+  handleClearingData();
 })();
 
-},{"./chartEvents/handleLabels":3,"./dataTools/DataActions":4,"./dataTools/DataProperties":5,"./dataTools/getModifiedData":7,"./graphTools/AxesFactory":8,"./graphTools/GraphActions":10,"./graphTools/GraphGroups":11,"./graphTools/GraphProperties":13,"d3":44}],3:[function(require,module,exports){
+},{"./chartEvents/handleClearingData":3,"./chartEvents/handleLabels":4,"./chartEvents/handleTooltips":5,"./dataTools/DataActions":6,"./dataTools/DataProperties":7,"./dataTools/getModifiedData":9,"./graphTools/AxesFactory":10,"./graphTools/GraphActions":12,"./graphTools/GraphGroups":13,"./graphTools/GraphProperties":15,"d3":47}],3:[function(require,module,exports){
+const { graphActions } = require("../graphTools/GraphActions");
+
+const { getAnimatedBtn } = graphActions;
+
+const handleClearingData = () => {
+  const btn = document.querySelector(".main__info--clear");
+
+  const getAllDataCleared = () => {};
+
+  btn.addEventListener("click", (e) => {
+    getAllDataCleared();
+    getAnimatedBtn(e.target, "active");
+
+    setTimeout(() => btn.classList.remove("active"), 210);
+  });
+};
+
+module.exports.handleClearingData = handleClearingData;
+
+},{"../graphTools/GraphActions":12}],4:[function(require,module,exports){
 const d3 = require("d3");
 const { graphProperties } = require("../graphTools/GraphProperties");
+const { graphActions } = require("../graphTools/GraphActions");
+
+const { getAnimatedBtn } = graphActions;
 
 const handleLabels = () => {
   const { labelsProperties, labelDurationTime } = graphProperties;
@@ -64804,18 +64831,45 @@ const handleLabels = () => {
       );
   };
 
-  const getToggleButtonClass = (e) => e.target.classList.toggle("active");
-
   btn.addEventListener("click", (e) => {
     getDisplayedLabels(e);
-    getToggleButtonClass(e);
+    getAnimatedBtn(e.target, "active");
     labelsProperties.clickedLabel = !labelsProperties.clickedLabel;
+
+    setTimeout(() => btn.classList.remove("active"), 210);
   });
 };
 
 module.exports.handleLabels = handleLabels;
 
-},{"../graphTools/GraphProperties":13,"d3":44}],4:[function(require,module,exports){
+},{"../graphTools/GraphActions":12,"../graphTools/GraphProperties":15,"d3":47}],5:[function(require,module,exports){
+const d3 = require("d3");
+const d3tip = require("d3-tip");
+const { groups } = require("../graphTools/GraphGroups");
+const { graphProperties } = require("../graphTools/GraphProperties");
+
+const tip = d3tip(d3);
+const { circlesGroup } = groups;
+const { margin } = graphProperties;
+
+const handleTooltips = () => {
+  const getTooltipContent = (d) => `<div>${d.tooltipText}</div>`;
+
+  tip
+    .attr("class", "tip")
+    .offset([-margin * 3, 0])
+    .html((d) => getTooltipContent(d));
+
+  circlesGroup
+    .selectAll("circle")
+    .call(tip)
+    .on("mouseover", (d, i, n) => tip.show(d, n[i]))
+    .on("mouseout", () => tip.hide());
+};
+
+module.exports.handleTooltips = handleTooltips;
+
+},{"../graphTools/GraphGroups":13,"../graphTools/GraphProperties":15,"d3":47,"d3-tip":43}],6:[function(require,module,exports){
 class DataActions {
   checkIfTrue = (condition, truthyOption, falsyOption) =>
     condition ? truthyOption : falsyOption;
@@ -64895,7 +64949,7 @@ const chartDataStructure = new ChartDataStructure();
 module.exports.dataActions = dataActions;
 module.exports.chartDataStructure = chartDataStructure;
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 class DataProperties {
   foreignLiteratureProperty = "literatura_obca";
   authors = "authors";
@@ -64905,10 +64959,10 @@ const dataProperties = new DataProperties();
 
 module.exports.dataProperties = dataProperties;
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 module.exports.DATA = require("../../data/data.json");
 
-},{"../../data/data.json":1}],7:[function(require,module,exports){
+},{"../../data/data.json":1}],9:[function(require,module,exports){
 const { DATA } = require("./authors");
 const { dataProperties } = require("./DataProperties");
 const { dataActions } = require("./DataActions");
@@ -64939,7 +64993,7 @@ module.exports.modifiedData = getSortedData(
   authors
 );
 
-},{"./DataActions":4,"./DataProperties":5,"./authors":6}],8:[function(require,module,exports){
+},{"./DataActions":6,"./DataProperties":7,"./authors":8}],10:[function(require,module,exports){
 const d3 = require("d3");
 const { groups } = require("./GraphGroups");
 const { graphParams } = require("./GraphParams");
@@ -64989,7 +65043,7 @@ module.exports.scalesAndAxesElements = {
   axes,
 };
 
-},{"./GraphActions":10,"./GraphGroups":11,"./GraphParams":12,"./GraphProperties":13,"d3":44}],9:[function(require,module,exports){
+},{"./GraphActions":12,"./GraphGroups":13,"./GraphParams":14,"./GraphProperties":15,"d3":47}],11:[function(require,module,exports){
 const d3 = require("d3");
 const { graphParams } = require("./GraphParams");
 
@@ -65024,7 +65078,7 @@ module.exports.Graph = class Graph {
   }
 };
 
-},{"./GraphParams":12,"d3":44}],10:[function(require,module,exports){
+},{"./GraphParams":14,"d3":47}],12:[function(require,module,exports){
 class GraphActions {
   getElementById = (idValue) => document.getElementById(idValue);
 
@@ -65062,13 +65116,15 @@ class GraphActions {
     item && scaleFn && typeof rValue === "number"
       ? scaleFn(item) - rValue * 1.5
       : null;
+
+  getAnimatedBtn = (item, className) => item.classList.add(className);
 }
 
 const graphActions = new GraphActions();
 
 module.exports.graphActions = graphActions;
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 const { Graph } = require("./Graph");
 const { graphParams } = require("./GraphParams");
 
@@ -65090,7 +65146,7 @@ const groups = new GraphGroups(chart.mainChart);
 
 module.exports.groups = groups;
 
-},{"./Graph":9,"./GraphParams":12}],12:[function(require,module,exports){
+},{"./Graph":11,"./GraphParams":14}],14:[function(require,module,exports){
 const { graphActions } = require("./GraphActions");
 const { graphProperties } = require("./GraphProperties");
 
@@ -65152,7 +65208,7 @@ module.exports.graphParams = {
   graphPositionProperties,
 };
 
-},{"./GraphActions":10,"./GraphProperties":13}],13:[function(require,module,exports){
+},{"./GraphActions":12,"./GraphProperties":15}],15:[function(require,module,exports){
 class GraphProperties {
   graphId = "graph";
 
@@ -65236,7 +65292,7 @@ const graphProperties = new GraphProperties();
 
 module.exports.graphProperties = graphProperties;
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 // https://d3js.org/d3-array/ v1.2.4 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -65828,7 +65884,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 // https://d3js.org/d3-axis/ v1.0.12 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -66023,7 +66079,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 // https://d3js.org/d3-brush/ v1.1.5 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-dispatch'), require('d3-drag'), require('d3-interpolate'), require('d3-selection'), require('d3-transition')) :
@@ -66642,7 +66698,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-dispatch":21,"d3-drag":22,"d3-interpolate":30,"d3-selection":36,"d3-transition":41}],17:[function(require,module,exports){
+},{"d3-dispatch":23,"d3-drag":24,"d3-interpolate":32,"d3-selection":38,"d3-transition":44}],19:[function(require,module,exports){
 // https://d3js.org/d3-chord/ v1.0.6 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array'), require('d3-path')) :
@@ -66874,7 +66930,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-array":14,"d3-path":31}],18:[function(require,module,exports){
+},{"d3-array":16,"d3-path":33}],20:[function(require,module,exports){
 // https://d3js.org/d3-collection/ v1.0.7 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -67093,7 +67149,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 // https://d3js.org/d3-color/ v1.4.1 Copyright 2020 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -67676,7 +67732,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 // https://d3js.org/d3-contour/ v1.3.2 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array')) :
@@ -68109,7 +68165,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-array":14}],21:[function(require,module,exports){
+},{"d3-array":16}],23:[function(require,module,exports){
 // https://d3js.org/d3-dispatch/ v1.0.6 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -68206,7 +68262,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 // https://d3js.org/d3-drag/ v1.2.5 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-dispatch'), require('d3-selection')) :
@@ -68442,7 +68498,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-dispatch":21,"d3-selection":36}],23:[function(require,module,exports){
+},{"d3-dispatch":23,"d3-selection":38}],25:[function(require,module,exports){
 // https://d3js.org/d3-dsv/ v1.2.0 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -68677,7 +68733,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 // https://d3js.org/d3-ease/ v1.0.6 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -68938,7 +68994,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 // https://d3js.org/d3-fetch/ v1.1.2 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-dsv')) :
@@ -69042,7 +69098,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-dsv":23}],26:[function(require,module,exports){
+},{"d3-dsv":25}],28:[function(require,module,exports){
 // https://d3js.org/d3-force/ v1.2.1 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-quadtree'), require('d3-collection'), require('d3-dispatch'), require('d3-timer')) :
@@ -69712,7 +69768,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-collection":18,"d3-dispatch":21,"d3-quadtree":33,"d3-timer":40}],27:[function(require,module,exports){
+},{"d3-collection":20,"d3-dispatch":23,"d3-quadtree":35,"d3-timer":42}],29:[function(require,module,exports){
 // https://d3js.org/d3-format/ v1.4.4 Copyright 2020 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -70053,7 +70109,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 // https://d3js.org/d3-geo/ v1.12.0 Copyright 2020 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array')) :
@@ -73224,7 +73280,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-array":14}],29:[function(require,module,exports){
+},{"d3-array":16}],31:[function(require,module,exports){
 // https://d3js.org/d3-hierarchy/ v1.1.9 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -74516,7 +74572,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],30:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 // https://d3js.org/d3-interpolate/ v1.4.0 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-color')) :
@@ -75111,7 +75167,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-color":19}],31:[function(require,module,exports){
+},{"d3-color":21}],33:[function(require,module,exports){
 // https://d3js.org/d3-path/ v1.0.9 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -75254,7 +75310,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 // https://d3js.org/d3-polygon/ v1.0.6 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -75406,7 +75462,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 // https://d3js.org/d3-quadtree/ v1.0.7 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -75827,7 +75883,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],34:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 // https://d3js.org/d3-random/ v1.1.2 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -75944,7 +76000,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 // https://d3js.org/d3-scale-chromatic/ v1.5.0 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-interpolate'), require('d3-color')) :
@@ -76467,7 +76523,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-color":19,"d3-interpolate":30}],36:[function(require,module,exports){
+},{"d3-color":21,"d3-interpolate":32}],38:[function(require,module,exports){
 // https://d3js.org/d3-selection/ v1.4.1 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -77458,7 +77514,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 // https://d3js.org/d3-shape/ v1.3.7 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-path')) :
@@ -79409,7 +79465,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-path":31}],38:[function(require,module,exports){
+},{"d3-path":33}],40:[function(require,module,exports){
 // https://d3js.org/d3-time-format/ v2.2.3 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-time')) :
@@ -80118,7 +80174,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-time":39}],39:[function(require,module,exports){
+},{"d3-time":41}],41:[function(require,module,exports){
 // https://d3js.org/d3-time/ v1.1.0 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -80493,7 +80549,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 // https://d3js.org/d3-timer/ v1.0.10 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -80644,7 +80700,347 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{}],41:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('d3-collection'), require('d3-selection')) :
+  typeof define === 'function' && define.amd ? define(['d3-collection', 'd3-selection'], factory) :
+  (global.d3 = global.d3 || {}, global.d3.tip = factory(global.d3,global.d3));
+}(this, (function (d3Collection,d3Selection) { 'use strict';
+
+  /**
+   * d3.tip
+   * Copyright (c) 2013-2017 Justin Palmer
+   *
+   * Tooltips for d3.js SVG visualizations
+   */
+  // Public - constructs a new tooltip
+  //
+  // Returns a tip
+  function index() {
+    var direction   = d3TipDirection,
+        offset      = d3TipOffset,
+        html        = d3TipHTML,
+        rootElement = document.body,
+        node        = initNode(),
+        svg         = null,
+        point       = null,
+        target      = null;
+
+    function tip(vis) {
+      svg = getSVGNode(vis);
+      if (!svg) return
+      point = svg.createSVGPoint();
+      rootElement.appendChild(node);
+    }
+
+    // Public - show the tooltip on the screen
+    //
+    // Returns a tip
+    tip.show = function() {
+      var args = Array.prototype.slice.call(arguments);
+      if (args[args.length - 1] instanceof SVGElement) target = args.pop();
+
+      var content = html.apply(this, args),
+          poffset = offset.apply(this, args),
+          dir     = direction.apply(this, args),
+          nodel   = getNodeEl(),
+          i       = directions.length,
+          coords,
+          scrollTop  = document.documentElement.scrollTop ||
+        rootElement.scrollTop,
+          scrollLeft = document.documentElement.scrollLeft ||
+        rootElement.scrollLeft;
+
+      nodel.html(content)
+        .style('opacity', 1).style('pointer-events', 'all');
+
+      while (i--) nodel.classed(directions[i], false);
+      coords = directionCallbacks.get(dir).apply(this);
+      nodel.classed(dir, true)
+        .style('top', (coords.top + poffset[0]) + scrollTop + 'px')
+        .style('left', (coords.left + poffset[1]) + scrollLeft + 'px');
+
+      return tip
+    };
+
+    // Public - hide the tooltip
+    //
+    // Returns a tip
+    tip.hide = function() {
+      var nodel = getNodeEl();
+      nodel.style('opacity', 0).style('pointer-events', 'none');
+      return tip
+    };
+
+    // Public: Proxy attr calls to the d3 tip container.
+    // Sets or gets attribute value.
+    //
+    // n - name of the attribute
+    // v - value of the attribute
+    //
+    // Returns tip or attribute value
+    // eslint-disable-next-line no-unused-vars
+    tip.attr = function(n, v) {
+      if (arguments.length < 2 && typeof n === 'string') {
+        return getNodeEl().attr(n)
+      }
+
+      var args =  Array.prototype.slice.call(arguments);
+      d3Selection.selection.prototype.attr.apply(getNodeEl(), args);
+      return tip
+    };
+
+    // Public: Proxy style calls to the d3 tip container.
+    // Sets or gets a style value.
+    //
+    // n - name of the property
+    // v - value of the property
+    //
+    // Returns tip or style property value
+    // eslint-disable-next-line no-unused-vars
+    tip.style = function(n, v) {
+      if (arguments.length < 2 && typeof n === 'string') {
+        return getNodeEl().style(n)
+      }
+
+      var args = Array.prototype.slice.call(arguments);
+      d3Selection.selection.prototype.style.apply(getNodeEl(), args);
+      return tip
+    };
+
+    // Public: Set or get the direction of the tooltip
+    //
+    // v - One of n(north), s(south), e(east), or w(west), nw(northwest),
+    //     sw(southwest), ne(northeast) or se(southeast)
+    //
+    // Returns tip or direction
+    tip.direction = function(v) {
+      if (!arguments.length) return direction
+      direction = v == null ? v : functor(v);
+
+      return tip
+    };
+
+    // Public: Sets or gets the offset of the tip
+    //
+    // v - Array of [x, y] offset
+    //
+    // Returns offset or
+    tip.offset = function(v) {
+      if (!arguments.length) return offset
+      offset = v == null ? v : functor(v);
+
+      return tip
+    };
+
+    // Public: sets or gets the html value of the tooltip
+    //
+    // v - String value of the tip
+    //
+    // Returns html value or tip
+    tip.html = function(v) {
+      if (!arguments.length) return html
+      html = v == null ? v : functor(v);
+
+      return tip
+    };
+
+    // Public: sets or gets the root element anchor of the tooltip
+    //
+    // v - root element of the tooltip
+    //
+    // Returns root node of tip
+    tip.rootElement = function(v) {
+      if (!arguments.length) return rootElement
+      rootElement = v == null ? v : functor(v);
+
+      return tip
+    };
+
+    // Public: destroys the tooltip and removes it from the DOM
+    //
+    // Returns a tip
+    tip.destroy = function() {
+      if (node) {
+        getNodeEl().remove();
+        node = null;
+      }
+      return tip
+    };
+
+    function d3TipDirection() { return 'n' }
+    function d3TipOffset() { return [0, 0] }
+    function d3TipHTML() { return ' ' }
+
+    var directionCallbacks = d3Collection.map({
+          n:  directionNorth,
+          s:  directionSouth,
+          e:  directionEast,
+          w:  directionWest,
+          nw: directionNorthWest,
+          ne: directionNorthEast,
+          sw: directionSouthWest,
+          se: directionSouthEast
+        }),
+        directions = directionCallbacks.keys();
+
+    function directionNorth() {
+      var bbox = getScreenBBox(this);
+      return {
+        top:  bbox.n.y - node.offsetHeight,
+        left: bbox.n.x - node.offsetWidth / 2
+      }
+    }
+
+    function directionSouth() {
+      var bbox = getScreenBBox(this);
+      return {
+        top:  bbox.s.y,
+        left: bbox.s.x - node.offsetWidth / 2
+      }
+    }
+
+    function directionEast() {
+      var bbox = getScreenBBox(this);
+      return {
+        top:  bbox.e.y - node.offsetHeight / 2,
+        left: bbox.e.x
+      }
+    }
+
+    function directionWest() {
+      var bbox = getScreenBBox(this);
+      return {
+        top:  bbox.w.y - node.offsetHeight / 2,
+        left: bbox.w.x - node.offsetWidth
+      }
+    }
+
+    function directionNorthWest() {
+      var bbox = getScreenBBox(this);
+      return {
+        top:  bbox.nw.y - node.offsetHeight,
+        left: bbox.nw.x - node.offsetWidth
+      }
+    }
+
+    function directionNorthEast() {
+      var bbox = getScreenBBox(this);
+      return {
+        top:  bbox.ne.y - node.offsetHeight,
+        left: bbox.ne.x
+      }
+    }
+
+    function directionSouthWest() {
+      var bbox = getScreenBBox(this);
+      return {
+        top:  bbox.sw.y,
+        left: bbox.sw.x - node.offsetWidth
+      }
+    }
+
+    function directionSouthEast() {
+      var bbox = getScreenBBox(this);
+      return {
+        top:  bbox.se.y,
+        left: bbox.se.x
+      }
+    }
+
+    function initNode() {
+      var div = d3Selection.select(document.createElement('div'));
+      div
+        .style('position', 'absolute')
+        .style('top', 0)
+        .style('opacity', 0)
+        .style('pointer-events', 'none')
+        .style('box-sizing', 'border-box');
+
+      return div.node()
+    }
+
+    function getSVGNode(element) {
+      var svgNode = element.node();
+      if (!svgNode) return null
+      if (svgNode.tagName.toLowerCase() === 'svg') return svgNode
+      return svgNode.ownerSVGElement
+    }
+
+    function getNodeEl() {
+      if (node == null) {
+        node = initNode();
+        // re-add node to DOM
+        rootElement.appendChild(node);
+      }
+      return d3Selection.select(node)
+    }
+
+    // Private - gets the screen coordinates of a shape
+    //
+    // Given a shape on the screen, will return an SVGPoint for the directions
+    // n(north), s(south), e(east), w(west), ne(northeast), se(southeast),
+    // nw(northwest), sw(southwest).
+    //
+    //    +-+-+
+    //    |   |
+    //    +   +
+    //    |   |
+    //    +-+-+
+    //
+    // Returns an Object {n, s, e, w, nw, sw, ne, se}
+    function getScreenBBox(targetShape) {
+      var targetel   = target || targetShape;
+
+      while (targetel.getScreenCTM == null && targetel.parentNode != null) {
+        targetel = targetel.parentNode;
+      }
+
+      var bbox       = {},
+          matrix     = targetel.getScreenCTM(),
+          tbbox      = targetel.getBBox(),
+          width      = tbbox.width,
+          height     = tbbox.height,
+          x          = tbbox.x,
+          y          = tbbox.y;
+
+      point.x = x;
+      point.y = y;
+      bbox.nw = point.matrixTransform(matrix);
+      point.x += width;
+      bbox.ne = point.matrixTransform(matrix);
+      point.y += height;
+      bbox.se = point.matrixTransform(matrix);
+      point.x -= width;
+      bbox.sw = point.matrixTransform(matrix);
+      point.y -= height / 2;
+      bbox.w = point.matrixTransform(matrix);
+      point.x += width;
+      bbox.e = point.matrixTransform(matrix);
+      point.x -= width / 2;
+      point.y -= height / 2;
+      bbox.n = point.matrixTransform(matrix);
+      point.y += height;
+      bbox.s = point.matrixTransform(matrix);
+
+      return bbox
+    }
+
+    // Private - replace D3JS 3.X d3.functor() function
+    function functor(v) {
+      return typeof v === 'function' ? v : function() {
+        return v
+      }
+    }
+
+    return tip
+  }
+
+  return index;
+
+})));
+
+},{"d3-collection":20,"d3-selection":38}],44:[function(require,module,exports){
 // https://d3js.org/d3-transition/ v1.3.2 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-dispatch'), require('d3-timer'), require('d3-interpolate'), require('d3-color'), require('d3-ease')) :
@@ -81526,7 +81922,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-color":19,"d3-dispatch":21,"d3-ease":24,"d3-interpolate":30,"d3-selection":36,"d3-timer":40}],42:[function(require,module,exports){
+},{"d3-color":21,"d3-dispatch":23,"d3-ease":26,"d3-interpolate":32,"d3-selection":38,"d3-timer":42}],45:[function(require,module,exports){
 // https://d3js.org/d3-voronoi/ v1.1.4 Copyright 2018 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -82527,7 +82923,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{}],43:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 // https://d3js.org/d3-zoom/ v1.8.3 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-dispatch'), require('d3-drag'), require('d3-interpolate'), require('d3-selection'), require('d3-transition')) :
@@ -83026,7 +83422,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 
-},{"d3-dispatch":21,"d3-drag":22,"d3-interpolate":30,"d3-selection":36,"d3-transition":41}],44:[function(require,module,exports){
+},{"d3-dispatch":23,"d3-drag":24,"d3-interpolate":32,"d3-selection":38,"d3-transition":44}],47:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -83315,7 +83711,7 @@ Object.keys(d3Zoom).forEach(function (k) {
 });
 exports.version = version;
 
-},{"d3-array":14,"d3-axis":15,"d3-brush":16,"d3-chord":17,"d3-collection":18,"d3-color":19,"d3-contour":20,"d3-dispatch":21,"d3-drag":22,"d3-dsv":23,"d3-ease":24,"d3-fetch":25,"d3-force":26,"d3-format":27,"d3-geo":28,"d3-hierarchy":29,"d3-interpolate":30,"d3-path":31,"d3-polygon":32,"d3-quadtree":33,"d3-random":34,"d3-scale":45,"d3-scale-chromatic":35,"d3-selection":36,"d3-shape":37,"d3-time":39,"d3-time-format":38,"d3-timer":40,"d3-transition":41,"d3-voronoi":42,"d3-zoom":43}],45:[function(require,module,exports){
+},{"d3-array":16,"d3-axis":17,"d3-brush":18,"d3-chord":19,"d3-collection":20,"d3-color":21,"d3-contour":22,"d3-dispatch":23,"d3-drag":24,"d3-dsv":25,"d3-ease":26,"d3-fetch":27,"d3-force":28,"d3-format":29,"d3-geo":30,"d3-hierarchy":31,"d3-interpolate":32,"d3-path":33,"d3-polygon":34,"d3-quadtree":35,"d3-random":36,"d3-scale":48,"d3-scale-chromatic":37,"d3-selection":38,"d3-shape":39,"d3-time":41,"d3-time-format":40,"d3-timer":42,"d3-transition":44,"d3-voronoi":45,"d3-zoom":46}],48:[function(require,module,exports){
 // https://d3js.org/d3-scale/ v2.2.2 Copyright 2019 Mike Bostock
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-collection'), require('d3-array'), require('d3-interpolate'), require('d3-format'), require('d3-time'), require('d3-time-format')) :
@@ -84482,4 +84878,4 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-},{"d3-array":14,"d3-collection":18,"d3-format":27,"d3-interpolate":30,"d3-time":39,"d3-time-format":38}]},{},[2]);
+},{"d3-array":16,"d3-collection":20,"d3-format":29,"d3-interpolate":32,"d3-time":41,"d3-time-format":40}]},{},[2]);

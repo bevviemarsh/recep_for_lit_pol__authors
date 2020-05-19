@@ -224,7 +224,6 @@ body {
 }
 
 .main__info--labels.active, .main__info--clear.active {
-  color: #b0a18f;
   -webkit-animation: buttonsAnimation 0.2s;
           animation: buttonsAnimation 0.2s;
 }
@@ -287,6 +286,14 @@ body {
   font-weight: lighter;
   color: #f3f0ec;
   text-transform: uppercase;
+}
+
+.tip {
+  padding: 1vw;
+  color: #f3f0ec;
+  background-color: #02111b;
+  letter-spacing: 0.1em;
+  opacity: 1;
 }
 
 @-webkit-keyframes buttonsAnimation {
