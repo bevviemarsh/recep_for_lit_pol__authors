@@ -22,7 +22,7 @@ const handleLabels = () => {
   };
 
   labelBtn.addEventListener("click", (e) => {
-    getDisplayedLabels(e);
+    getDisplayedLabels();
     getAnimatedBtn(e.target, "active");
     labelsProperties.clickedLabel = !labelsProperties.clickedLabel;
 

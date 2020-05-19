@@ -64610,7 +64610,6 @@ module.exports=[
   const { handleDisplayData } = require("./chartEvents/handleDisplayData");
 
   const { inputs } = elements;
-  const { literatureType, literatureInfo } = modifiedData;
   const { getFilteredByProperty, checkIfTrue } = dataActions;
   const { authors } = dataProperties;
 
@@ -64622,17 +64621,15 @@ module.exports=[
     const { groups } = require("./graphTools/GraphGroups");
     const { scalesAndAxesElements } = require("./graphTools/AxesFactory");
 
-    const getLollipopChartData = (mainData, additionalData) => {
+    const getLollipopChartData = (data) => {
       const { colors, radius } = graphProperties;
       const { fireEngineRed, queenBlue } = colors;
 
-      const dataForLollipopChart = mainData;
-      const dataForDisplayContainer = additionalData;
+      const dataForLollipopChart = data;
 
       getUpdatedChart(
         chartDataStructure.getLollipopStructure(
           dataForLollipopChart,
-          dataForDisplayContainer,
           queenBlue,
           fireEngineRed,
           radius(dataForLollipopChart)
@@ -64771,12 +64768,11 @@ module.exports=[
       if (e.target.checked) {
         lollipopChart.runChart(
           getFilteredByProperty(
-            literatureType,
+            modifiedData,
             checkIfTrue(e.target.checked, e.target.value, 0),
             checkIfTrue(e.target.checked, e.target.dataset.range, 0),
             authors
-          ),
-          literatureInfo
+          )
         );
 
         inputs.forEach((input) => (input.checked = false));
@@ -64845,7 +64841,7 @@ const { authorFirstName, authorLastName } = dataProperties;
 
 const handleDisplayData = () => {
   const getAuthorsDetails = (d) => {
-    authorsDetails.innerHTML = d.authorsDetails.info
+    authorsDetails.innerHTML = d.authorsDetails
       .map(
         (data) =>
           `<ul><li class="details">${data[authorFirstName]} ${data[authorLastName]}</li></ul>`
@@ -64898,7 +64894,7 @@ const handleLabels = () => {
   };
 
   labelBtn.addEventListener("click", (e) => {
-    getDisplayedLabels(e);
+    getDisplayedLabels();
     getAnimatedBtn(e.target, "active");
     labelsProperties.clickedLabel = !labelsProperties.clickedLabel;
 
@@ -65026,15 +65022,9 @@ class ChartDataStructure extends DataActions {
     super();
   }
 
-  getLollipopStructure = (
-    mainArray,
-    additionalArray,
-    lineColorName,
-    circleColorName,
-    radiusValue
-  ) =>
-    mainArray.map((d, i) => ({
-      id: `${d.type}-${i}-${mainArray.length}`,
+  getLollipopStructure = (array, lineColorName, circleColorName, radiusValue) =>
+    array.map((d, i) => ({
+      id: `${d.completeInfo.id}-${d.type}-${i}-${array.length}`,
       x1: d.type,
       x2: d.type,
       y1: 0,
@@ -65046,9 +65036,7 @@ class ChartDataStructure extends DataActions {
       r: this.getItem(radiusValue),
       circleColor: this.getItem(circleColorName),
       tooltipText: d.type,
-      authorsDetails: additionalArray.find(
-        (dd) => dd.info.length === d.authors
-      ),
+      authorsDetails: d.completeInfo.info,
     }));
 }
 
@@ -65103,31 +65091,42 @@ const {
 
 const authorsData = DATA;
 
-module.exports.modifiedData = {
-  literatureType: getSortedData(
-    getDataStructure(
-      getArrayFromObject(
-        getNumberOfAuthors(
-          getLiteraturesTypes(authorsData, foreignLiteratureTypeProperty)
-        )
-      ),
-      getHeadOfList,
-      getTailOfList,
-      type,
-      authors
-    ),
-    authors
-  ),
-  literatureInfo: getDataStructure(
+const literatureType = getSortedData(
+  getDataStructure(
     getArrayFromObject(
-      getGroupedDataById(authorsData, foreignLiteratureIdProperty)
+      getNumberOfAuthors(
+        getLiteraturesTypes(authorsData, foreignLiteratureTypeProperty)
+      )
     ),
     getHeadOfList,
     getTailOfList,
-    id,
-    info
+    type,
+    authors
   ),
-};
+  authors
+);
+
+const literatureInfo = getDataStructure(
+  getArrayFromObject(
+    getGroupedDataById(authorsData, foreignLiteratureIdProperty)
+  ),
+  getHeadOfList,
+  getTailOfList,
+  id,
+  info
+);
+
+const completeData = literatureType.map((d) => ({
+  type: d.type,
+  authors: d.authors,
+  completeInfo: literatureInfo.find((dd) =>
+    dd.info.find((ddd) =>
+      ddd[foreignLiteratureTypeProperty].find((dddd) => dddd === d.type)
+    )
+  ),
+}));
+
+module.exports.modifiedData = completeData;
 
 },{"./DataActions":9,"./DataProperties":10,"./authors":11}],13:[function(require,module,exports){
 const d3 = require("d3");

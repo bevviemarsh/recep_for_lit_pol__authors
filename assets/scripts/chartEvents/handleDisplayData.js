@@ -9,7 +9,7 @@ const { authorFirstName, authorLastName } = dataProperties;
 
 const handleDisplayData = () => {
   const getAuthorsDetails = (d) => {
-    authorsDetails.innerHTML = d.authorsDetails.info
+    authorsDetails.innerHTML = d.authorsDetails
       .map(
         (data) =>
           `<ul><li class="details">${data[authorFirstName]} ${data[authorLastName]}</li></ul>`

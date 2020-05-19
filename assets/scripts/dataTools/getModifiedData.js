@@ -23,28 +23,39 @@ const {
 
 const authorsData = DATA;
 
-module.exports.modifiedData = {
-  literatureType: getSortedData(
-    getDataStructure(
-      getArrayFromObject(
-        getNumberOfAuthors(
-          getLiteraturesTypes(authorsData, foreignLiteratureTypeProperty)
-        )
-      ),
-      getHeadOfList,
-      getTailOfList,
-      type,
-      authors
-    ),
-    authors
-  ),
-  literatureInfo: getDataStructure(
+const literatureType = getSortedData(
+  getDataStructure(
     getArrayFromObject(
-      getGroupedDataById(authorsData, foreignLiteratureIdProperty)
+      getNumberOfAuthors(
+        getLiteraturesTypes(authorsData, foreignLiteratureTypeProperty)
+      )
     ),
     getHeadOfList,
     getTailOfList,
-    id,
-    info
+    type,
+    authors
   ),
-};
+  authors
+);
+
+const literatureInfo = getDataStructure(
+  getArrayFromObject(
+    getGroupedDataById(authorsData, foreignLiteratureIdProperty)
+  ),
+  getHeadOfList,
+  getTailOfList,
+  id,
+  info
+);
+
+const completeData = literatureType.map((d) => ({
+  type: d.type,
+  authors: d.authors,
+  completeInfo: literatureInfo.find((dd) =>
+    dd.info.find((ddd) =>
+      ddd[foreignLiteratureTypeProperty].find((dddd) => dddd === d.type)
+    )
+  ),
+}));
+
+module.exports.modifiedData = completeData;

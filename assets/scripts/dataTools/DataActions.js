@@ -64,15 +64,9 @@ class ChartDataStructure extends DataActions {
     super();
   }
 
-  getLollipopStructure = (
-    mainArray,
-    additionalArray,
-    lineColorName,
-    circleColorName,
-    radiusValue
-  ) =>
-    mainArray.map((d, i) => ({
-      id: `${d.type}-${i}-${mainArray.length}`,
+  getLollipopStructure = (array, lineColorName, circleColorName, radiusValue) =>
+    array.map((d, i) => ({
+      id: `${d.completeInfo.id}-${d.type}-${i}-${array.length}`,
       x1: d.type,
       x2: d.type,
       y1: 0,
@@ -84,9 +78,7 @@ class ChartDataStructure extends DataActions {
       r: this.getItem(radiusValue),
       circleColor: this.getItem(circleColorName),
       tooltipText: d.type,
-      authorsDetails: additionalArray.find(
-        (dd) => dd.info.length === d.authors
-      ),
+      authorsDetails: d.completeInfo.info,
     }));
 }
 

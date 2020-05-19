@@ -9,7 +9,6 @@
   const { handleDisplayData } = require("./chartEvents/handleDisplayData");
 
   const { inputs } = elements;
-  const { literatureType, literatureInfo } = modifiedData;
   const { getFilteredByProperty, checkIfTrue } = dataActions;
   const { authors } = dataProperties;
 
@@ -21,17 +20,15 @@
     const { groups } = require("./graphTools/GraphGroups");
     const { scalesAndAxesElements } = require("./graphTools/AxesFactory");
 
-    const getLollipopChartData = (mainData, additionalData) => {
+    const getLollipopChartData = (data) => {
       const { colors, radius } = graphProperties;
       const { fireEngineRed, queenBlue } = colors;
 
-      const dataForLollipopChart = mainData;
-      const dataForDisplayContainer = additionalData;
+      const dataForLollipopChart = data;
 
       getUpdatedChart(
         chartDataStructure.getLollipopStructure(
           dataForLollipopChart,
-          dataForDisplayContainer,
           queenBlue,
           fireEngineRed,
           radius(dataForLollipopChart)
@@ -170,12 +167,11 @@
       if (e.target.checked) {
         lollipopChart.runChart(
           getFilteredByProperty(
-            literatureType,
+            modifiedData,
             checkIfTrue(e.target.checked, e.target.value, 0),
             checkIfTrue(e.target.checked, e.target.dataset.range, 0),
             authors
-          ),
-          literatureInfo
+          )
         );
 
         inputs.forEach((input) => (input.checked = false));
