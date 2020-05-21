@@ -28,7 +28,12 @@ class DataActions {
       : [];
 
   getDataStructure = (array, headFn, tailFn, keyValue, propertyValue) =>
-    array && array.length && headFn && tailFn
+    array &&
+    array.length &&
+    headFn &&
+    tailFn &&
+    typeof keyValue === "string" &&
+    typeof propertyValue === "string"
       ? array.map((d) => ({
           [`${keyValue}`]: headFn(d),
           [`${propertyValue}`]: tailFn(d),
@@ -49,14 +54,16 @@ class DataActions {
       : {};
 
   getGroupedDataById = (array, propertyName) =>
-    array.reduce((acc, obj) => {
-      let key = obj[propertyName];
-      if (!acc[key]) {
-        acc[key] = [];
-      }
-      acc[key].push(obj);
-      return acc;
-    }, {});
+    array && array.length && propertyName && typeof propertyName === "string"
+      ? array.reduce((acc, obj) => {
+          let key = obj[propertyName];
+          if (!acc[key]) {
+            acc[key] = [];
+          }
+          acc[key].push(obj);
+          return acc;
+        }, {})
+      : {};
 }
 
 class ChartDataStructure extends DataActions {

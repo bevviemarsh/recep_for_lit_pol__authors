@@ -1,10 +1,15 @@
 class GraphActions {
-  getElementById = (idValue) => document.getElementById(idValue);
+  getElementById = (idValue) =>
+    typeof idValue === "string" && idValue
+      ? document.getElementById(idValue)
+      : null;
 
   getXAxisTextDimension = (textItem, marginBottomValue) =>
-    textItem.length < marginBottomValue / 5
-      ? textItem
-      : `${textItem.substr(0, marginBottomValue / 6)}...`;
+    typeof textItem === "string" && typeof marginBottomValue === "number"
+      ? textItem.length < marginBottomValue / 5
+        ? textItem
+        : `${textItem.substr(0, marginBottomValue / 6)}...`
+      : "";
 
   mapArray = (array, dataElement) =>
     array && array.length && typeof dataElement === "string"
@@ -25,18 +30,23 @@ class GraphActions {
   };
 
   translate = (xValue, yValue) =>
-    typeof xValue === "number" || typeof yValue === "number"
+    typeof xValue === "number" && typeof yValue === "number"
       ? `translate(${xValue}, ${yValue})`
       : `translate(0, 0)`;
 
   rotate = (num) => (typeof num === "number" ? `rotate(${num})` : `rotate(0)`);
 
   getLabelsYPosition = (item, scaleFn, rValue) =>
-    item && scaleFn && typeof rValue === "number"
+    typeof item === "number" &&
+    typeof scaleFn === "function" &&
+    typeof rValue === "number"
       ? scaleFn(item) - rValue * 1.5
       : null;
 
-  getAnimatedBtn = (item, className) => item.classList.add(className);
+  getAnimatedBtn = (item, className) =>
+    item && className && typeof className === "string"
+      ? item.classList.add(className)
+      : null;
 }
 
 const graphActions = new GraphActions();

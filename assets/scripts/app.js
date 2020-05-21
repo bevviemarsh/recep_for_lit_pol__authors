@@ -37,7 +37,6 @@
     };
 
     const renderView = (data) => {
-      console.log("data from render", data);
       const { linesGroup, circlesGroup, labelsGroup } = groups;
       const { scales, axes } = scalesAndAxesElements;
       const {
@@ -183,7 +182,7 @@
       }
     })
   );
-  lollipopChart.runChart([]);
   handleLabels();
   handleClearingData();
+  lollipopChart.runChart([]);
 })();

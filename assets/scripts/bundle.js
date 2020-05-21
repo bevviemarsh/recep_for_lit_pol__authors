@@ -64638,7 +64638,6 @@ module.exports=[
     };
 
     const renderView = (data) => {
-      console.log("data from render", data);
       const { linesGroup, circlesGroup, labelsGroup } = groups;
       const { scales, axes } = scalesAndAxesElements;
       const {
@@ -64784,9 +64783,9 @@ module.exports=[
       }
     })
   );
-  lollipopChart.runChart([]);
   handleLabels();
   handleClearingData();
+  lollipopChart.runChart([]);
 })();
 
 },{"./chartEvents/DOMElements":3,"./chartEvents/handleClearingData":4,"./chartEvents/handleDisplayData":5,"./chartEvents/handleLabels":6,"./chartEvents/handleTooltips":8,"./dataTools/DataActions":9,"./dataTools/DataProperties":10,"./dataTools/getModifiedData":12,"./graphTools/AxesFactory":13,"./graphTools/GraphActions":15,"./graphTools/GraphGroups":16,"./graphTools/GraphProperties":18,"d3":50}],3:[function(require,module,exports){
@@ -64807,7 +64806,7 @@ const { elements } = require("./DOMElements");
 const { graphActions } = require("../graphTools/GraphActions");
 const { groups } = require("../graphTools/GraphGroups");
 
-const { clearBtn } = elements;
+const { clearBtn, searchingInput } = elements;
 const { getAnimatedBtn } = graphActions;
 const { circlesGroup } = groups;
 
@@ -64817,12 +64816,13 @@ const handleClearingData = () => {
     circlesGroup
       .selectAll("circle")
       .each((d, i, n) => n[i].classList.remove("activeCircle"));
+    searchingInput.value = "";
   };
 
   clearBtn.addEventListener("click", (e) => {
     getAllDataCleared();
-    getAnimatedBtn(e.target, "active");
 
+    getAnimatedBtn(e.target, "active");
     setTimeout(() => clearBtn.classList.remove("active"), 210);
   });
 };
@@ -64986,7 +64986,12 @@ class DataActions {
       : [];
 
   getDataStructure = (array, headFn, tailFn, keyValue, propertyValue) =>
-    array && array.length && headFn && tailFn
+    array &&
+    array.length &&
+    headFn &&
+    tailFn &&
+    typeof keyValue === "string" &&
+    typeof propertyValue === "string"
       ? array.map((d) => ({
           [`${keyValue}`]: headFn(d),
           [`${propertyValue}`]: tailFn(d),
@@ -65007,14 +65012,16 @@ class DataActions {
       : {};
 
   getGroupedDataById = (array, propertyName) =>
-    array.reduce((acc, obj) => {
-      let key = obj[propertyName];
-      if (!acc[key]) {
-        acc[key] = [];
-      }
-      acc[key].push(obj);
-      return acc;
-    }, {});
+    array && array.length && propertyName && typeof propertyName === "string"
+      ? array.reduce((acc, obj) => {
+          let key = obj[propertyName];
+          if (!acc[key]) {
+            acc[key] = [];
+          }
+          acc[key].push(obj);
+          return acc;
+        }, {})
+      : {};
 }
 
 class ChartDataStructure extends DataActions {
@@ -65215,12 +65222,17 @@ module.exports.Graph = class Graph {
 
 },{"./GraphParams":17,"d3":50}],15:[function(require,module,exports){
 class GraphActions {
-  getElementById = (idValue) => document.getElementById(idValue);
+  getElementById = (idValue) =>
+    typeof idValue === "string" && idValue
+      ? document.getElementById(idValue)
+      : null;
 
   getXAxisTextDimension = (textItem, marginBottomValue) =>
-    textItem.length < marginBottomValue / 5
-      ? textItem
-      : `${textItem.substr(0, marginBottomValue / 6)}...`;
+    typeof textItem === "string" && typeof marginBottomValue === "number"
+      ? textItem.length < marginBottomValue / 5
+        ? textItem
+        : `${textItem.substr(0, marginBottomValue / 6)}...`
+      : "";
 
   mapArray = (array, dataElement) =>
     array && array.length && typeof dataElement === "string"
@@ -65241,18 +65253,23 @@ class GraphActions {
   };
 
   translate = (xValue, yValue) =>
-    typeof xValue === "number" || typeof yValue === "number"
+    typeof xValue === "number" && typeof yValue === "number"
       ? `translate(${xValue}, ${yValue})`
       : `translate(0, 0)`;
 
   rotate = (num) => (typeof num === "number" ? `rotate(${num})` : `rotate(0)`);
 
   getLabelsYPosition = (item, scaleFn, rValue) =>
-    item && scaleFn && typeof rValue === "number"
+    typeof item === "number" &&
+    typeof scaleFn === "function" &&
+    typeof rValue === "number"
       ? scaleFn(item) - rValue * 1.5
       : null;
 
-  getAnimatedBtn = (item, className) => item.classList.add(className);
+  getAnimatedBtn = (item, className) =>
+    item && className && typeof className === "string"
+      ? item.classList.add(className)
+      : null;
 }
 
 const graphActions = new GraphActions();

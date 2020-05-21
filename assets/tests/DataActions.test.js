@@ -8,9 +8,10 @@ const {
   getFilteredByProperty,
   getSortedData,
   getArrayFromObject,
-  getCountedAuthorsStructure,
+  getDataStructure,
   getLiteraturesTypes,
   getNumberOfAuthors,
+  getGroupedDataById,
 } = dataActions;
 
 test("check given condition", () => {
@@ -212,24 +213,56 @@ test("get proper structure with first and last elements", () => {
   ];
   const headFn = getHeadOfList;
   const tailFn = getTailOfList;
+  const exampleKeyValue = "name";
+  const examplePropValue = "authors";
   const expectedArray = [
     { name: "a", authors: 1 },
     { name: "b", authors: 2 },
   ];
 
-  expect(getCountedAuthorsStructure(testedArray, headFn, tailFn)).toStrictEqual(
-    expectedArray
-  );
+  expect(
+    getDataStructure(
+      testedArray,
+      headFn,
+      tailFn,
+      exampleKeyValue,
+      examplePropValue
+    )
+  ).toStrictEqual(expectedArray);
 });
 
 test("get empty array from counted authors structure function", () => {
   const testedEmptyArray = [];
+  const testedArray = [
+    ["a", 1],
+    ["b", 2],
+  ];
   const headFn = getHeadOfList;
   const tailFn = getTailOfList;
+  const exampleKeyValue = "name";
+  const examplePropValue = "authors";
+  const exampleInvalidKeyValue = 23;
+  const exampleInvalidPropValue = { a: "23" };
   const expectedEmptyArray = [];
 
   expect(
-    getCountedAuthorsStructure(testedEmptyArray, headFn, tailFn)
+    getDataStructure(
+      testedEmptyArray,
+      headFn,
+      tailFn,
+      exampleKeyValue,
+      examplePropValue
+    )
+  ).toStrictEqual(expectedEmptyArray);
+
+  expect(
+    getDataStructure(
+      testedArray,
+      headFn,
+      tailFn,
+      exampleInvalidKeyValue,
+      exampleInvalidPropValue
+    )
   ).toStrictEqual(expectedEmptyArray);
 });
 
@@ -287,6 +320,51 @@ test("no counted authors, received empty object from empty array input", () => {
   const expectedEmptyObject = {};
 
   expect(getNumberOfAuthors(testedEmptyArray)).toStrictEqual(
+    expectedEmptyObject
+  );
+});
+
+test("group elements by id", () => {
+  const exampleArray = [
+    { id: "30", type: "literatura francuska", name: "first author" },
+    { id: "20", type: "literatura belgijska", name: "first author" },
+    { id: "30", type: "literatura francuska", name: "second author" },
+    { id: "30", type: "literatura francuska", name: "third author" },
+    { id: "10", type: "literatura kanadyjska", name: "first author" },
+  ];
+  const exampleProperty = "id";
+  const expectedObject = {
+    30: [
+      { id: "30", type: "literatura francuska", name: "first author" },
+      { id: "30", type: "literatura francuska", name: "second author" },
+      { id: "30", type: "literatura francuska", name: "third author" },
+    ],
+    20: [{ id: "20", type: "literatura belgijska", name: "first author" }],
+    10: [{ id: "10", type: "literatura kanadyjska", name: "first author" }],
+  };
+
+  expect(getGroupedDataById(exampleArray, exampleProperty)).toEqual(
+    expectedObject
+  );
+});
+
+test("group elements with invalid array / property", () => {
+  const exampleArray = [
+    { id: "30", type: "literatura francuska", name: "first author" },
+    { id: "20", type: "literatura belgijska", name: "first author" },
+    { id: "30", type: "literatura francuska", name: "second author" },
+    { id: "30", type: "literatura francuska", name: "third author" },
+    { id: "10", type: "literatura kanadyjska", name: "first author" },
+  ];
+  const exampleProperty = "id";
+  const exampleEmptyArray = [];
+  const exampleInvaildProperty = "";
+  const expectedEmptyObject = {};
+
+  expect(getGroupedDataById(exampleArray, exampleInvaildProperty)).toEqual(
+    expectedEmptyObject
+  );
+  expect(getGroupedDataById(exampleEmptyArray, exampleProperty)).toEqual(
     expectedEmptyObject
   );
 });
