@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/bevviemarsh/recep_for_lit_pol__authors#readme",
   "dependencies": {
-    "d3": "^5.16.0",
-    "d3-scale": "^3.2.1",
+    "d3": "^7.6.1",
+    "d3-scale": "^4.0.2",
     "d3-tip": "^0.9.1",
     "watchify": "^3.11.1"
   },
